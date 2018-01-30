@@ -1,0 +1,9 @@
+{
+  "name": "tug-of-words-server",
+  "version": "1.0.0",
+  "description": "Server for Tug of Wordss",
+  "main": "index.js",
+  "repository": "git@github.com:TugOfWords/tug-of-words-server.git",
+  "author": "Charlie Crouse <charlietcrouse@gmail.com>",
+  "license": "MIT"
+}
