@@ -5,5 +5,9 @@
   "main": "index.js",
   "repository": "git@github.com:TugOfWords/tug-of-words-server.git",
   "author": "Charlie Crouse <charlietcrouse@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.2",
+    "socket.io": "^2.0.4"
+  }
 }
