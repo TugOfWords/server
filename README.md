@@ -17,6 +17,7 @@ We will be using [yarn](https://yarnpkg.com/en/) rather than npm for dependency 
 ### Testing
 - To run tests:
 `yarn test`
+- You will not be able to commit code unless it passes all tests
 ### Linting
 We are using [eslint](https://eslint.org/) with enforced [styles](https://github.com/airbnb/javascript) defined by Airbnb
 - To lint the entire code:
