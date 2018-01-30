@@ -14,3 +14,11 @@ We will be using [yarn](https://yarnpkg.com/en/) rather than npm for dependency 
 `yarn remove <dependency_name>`
 #### Best Practices
 - Please follow the guidelines suggested [here](https://github.com/wearehive/project-guidelines)
+### Testing
+- To run tests:
+`yarn test`
+### Linting
+We are using [eslint](https://eslint.org/) with enforced [styles](https://github.com/airbnb/javascript) defined by Airbnb
+- To lint the entire code:
+`yarn lint`
+- You will not be able to commit code unless it passes the linter checks
