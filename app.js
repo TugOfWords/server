@@ -2,6 +2,9 @@ const express = require('express');
 const socketio = require('socket.io');
 const http = require('http');
 
+// import the modules
+const { createUser } = require('./modules/user');
+
 // initialize the server
 const app = express();
 const server = http.createServer(app);
@@ -15,6 +18,9 @@ const io = socketio(server);
 const onConnection = (socket) => {
   // client disconnect handler
   socket.on('disconnect', () => console.log('Client has disconnected'));
+
+  // create new user handler
+  socket.on('createUser', data => createUser(data.id, data.username));
 };
 
 // initialize socket handler
