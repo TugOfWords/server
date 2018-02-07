@@ -4,6 +4,13 @@ This is the repository that holds the server-side code for our CS 408 Project, T
 
 ### Development
 We will be using [yarn](https://yarnpkg.com/en/) rather than npm for dependency management.
+#### Running the server
+- To run the server simply type the following
+`node app.js`
+- I encourage you install nodemon, a package that refreshes the running server when you make changes
+`yarn global add nodemon`
+- To run the server with nodemon
+`nodemon app.js`
 #### Adding a dependency
 - Always consult the team before adding a new dependency. If it is something small, you should write your own module instead of adding to the list of dependencies
 `yarn add <dependency_name>`
