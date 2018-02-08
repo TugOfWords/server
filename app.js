@@ -8,14 +8,30 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 /**
- * Connection handler for the websocket
- * @param {Object} socket
- *   the communication channel between the client and the server
- */
+* Connection handler for the websocket
+* @param {Object} socket
+*   the communication channel between the client and the server
+*/
 const onConnection = (socket) => {
-  // client disconnect handler
+ // client disconnect handler
+ socket.on('createUser', () => {
+
+ });
+
+socket.on('joinRoom', () => {
+     socket.join(uid);
+});
+
+socket.on('senWord', () => {
+
+});
+
   socket.on('disconnect', () => console.log('Client has disconnected'));
 };
+
+// function getWord(){
+
+// }
 
 // initialize socket handler
 io.on('connection', socket => onConnection(socket));
