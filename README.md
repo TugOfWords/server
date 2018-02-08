@@ -21,6 +21,8 @@ We will be using [yarn](https://yarnpkg.com/en/) rather than npm for dependency 
 `yarn remove <dependency_name>`
 #### Best Practices
 - Please follow the guidelines suggested [here](https://github.com/wearehive/project-guidelines)
+#### React Components
+- We will be using predifined components from [Semantic-UI](https://react.semantic-ui.com/introduction)
 ### Testing
 - To run tests:
 `yarn test`

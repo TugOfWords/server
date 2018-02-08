@@ -8,7 +8,8 @@
   "license": "MIT",
   "scripts": {
     "test": "mocha **/*.test.js --recursive --exit",
-    "lint": "eslint . --ext .js"
+    "lint": "eslint . --ext .js",
+    "validate": "npm ls"
   },
   "dependencies": {
     "express": "^4.16.2",
