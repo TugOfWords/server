@@ -4,6 +4,7 @@ const http = require('http');
 
 // import the modules
 const { createUser } = require('./modules/user');
+const { createRoom } = require('./modules/room');
 
 // initialize the server
 const app = express();
@@ -20,7 +21,10 @@ const onConnection = (socket) => {
   socket.on('disconnect', () => console.log('Client has disconnected'));
 
   // create new user handler
-  socket.on('createUser', data => createUser(data.id, data.username));
+  socket.on('createUser', data => createUser(data.uid, data.username));
+
+  // create new room handler
+  socket.on('createRoom', data => createRoom(data.rid));
 };
 
 // initialize socket handler
