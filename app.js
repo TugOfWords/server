@@ -6,6 +6,7 @@ const http = require('http');
 // import the modules
 const { createRoom, roomRouter } = require('./modules/room');
 const { createUser, removeUser } = require('./modules/user');
+const { getWord } = require('./modules/game');
 
 // initialize the server
 const app = express();
@@ -16,12 +17,13 @@ app.use(bodyParser.json());
 app.use('/rooms', roomRouter);
 
 /**
- * Connection handler for the websocket
- * @param {Object} socket
- *   the communication channel between the client and the server
- */
+* Connection handler for the websocket
+* @param {Object} socket
+*   the communication channel between the client and the server
+*/
 const onConnection = (socket) => {
-  // client disconnect handler
+  socket.on('sendWord', () => console.log(getWord()));
+
   socket.on('disconnect', () => console.log('Client has disconnected'));
 
   // create new user handler
