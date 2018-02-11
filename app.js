@@ -1,11 +1,11 @@
 const express = require('express');
 const socketio = require('socket.io');
 const http = require('http');
-//const randomWords = require('random-words');
 
 // import the modules
 const { createUser, removeUser } = require('./modules/user');
 const { createRoom } = require('./modules/room');
+const { getWord } = require('./modules/game');
 
 // initialize the server
 const app = express();
@@ -27,9 +27,7 @@ const onConnection = (socket) => {
   //   socket.join(uid);
   // });
 
-  socket.on('sendWord', () => {
-    //  TODO: uncomment and send getWord()
-  });
+  socket.on('sendWord', () => console.log(getWord()));
 
   socket.on('disconnect', () => console.log('Client has disconnected'));
 
@@ -42,10 +40,6 @@ const onConnection = (socket) => {
   // create new room handler
   socket.on('createRoom', data => createRoom(data.rid));
 };
-
-// function getWord(){
-//   return randomWords();
-// }
 
 // initialize socket handler
 io.on('connection', socket => onConnection(socket));
