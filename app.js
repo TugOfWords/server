@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const socketio = require('socket.io');
 const http = require('http');
+const cors = require('cors');
 
 // import the modules
 const { createRoom, roomRouter } = require('./modules/room');
@@ -13,6 +14,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use('/rooms', roomRouter);
 app.use('/users', userRouter);
