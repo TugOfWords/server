@@ -3,6 +3,10 @@ const socketio = require('socket.io');
 const http = require('http');
 //const randomWords = require('random-words');
 
+// import the modules
+const { createUser, removeUser } = require('./modules/user');
+const { createRoom } = require('./modules/room');
+
 // initialize the server
 const app = express();
 const server = http.createServer(app);
@@ -28,6 +32,15 @@ const onConnection = (socket) => {
   });
 
   socket.on('disconnect', () => console.log('Client has disconnected'));
+
+  // create new user handler
+  socket.on('createUser', data => createUser(data.uid, data.username));
+
+  // remove user from database
+  socket.on('removeUser', data => removeUser(data.uid));
+
+  // create new room handler
+  socket.on('createRoom', data => createRoom(data.rid));
 };
 
 // function getWord(){
