@@ -31,5 +31,6 @@ userRouter.post('/removeUser', (req, res) => {
 
 module.exports = {
   createUser,
+  removeUser,
   userRouter,
 };
