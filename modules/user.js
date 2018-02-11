@@ -1,5 +1,7 @@
 const firebase = require('../fire');
+const express = require('express');
 
+const userRouter = express.Router();
 /**
  * Creates a new entry at the /users/:id firebase endpoint with the given username
  * @param {String} uid
@@ -13,11 +15,21 @@ const createUser = (uid, username) => {
   });
 };
 
+userRouter.post('/createUser', (req, res) => {
+  createUser(req.body.uid, req.body.username);
+  res.send({ message: 'Success' });
+});
+
 const removeUser = (uid) => {
   firebase.ref(`users/${uid}`).remove();
 };
 
+userRouter.post('/removeUser', (req, res) => {
+  removeUser(req.body.uid);
+  res.send({ message: 'Success' });
+});
+
 module.exports = {
   createUser,
-  removeUser,
+  userRouter,
 };

@@ -5,7 +5,7 @@ const http = require('http');
 
 // import the modules
 const { createRoom, roomRouter } = require('./modules/room');
-const { createUser, removeUser } = require('./modules/user');
+const { createUser, removeUser, userRouter } = require('./modules/user');
 const { getWord } = require('./modules/game');
 
 // initialize the server
@@ -15,6 +15,7 @@ const io = socketio(server);
 
 app.use(bodyParser.json());
 app.use('/rooms', roomRouter);
+app.use('/users', userRouter);
 
 /**
 * Connection handler for the websocket
