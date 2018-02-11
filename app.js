@@ -3,7 +3,7 @@ const socketio = require('socket.io');
 const http = require('http');
 
 // import the modules
-const { createUser } = require('./modules/user');
+const { createUser, removeUser } = require('./modules/user');
 const { createRoom } = require('./modules/room');
 
 // initialize the server
@@ -22,6 +22,9 @@ const onConnection = (socket) => {
 
   // create new user handler
   socket.on('createUser', data => createUser(data.uid, data.username));
+
+  // remove user from database
+  socket.on('removeUser', data => removeUser(data.uid));
 
   // create new room handler
   socket.on('createRoom', data => createRoom(data.rid));

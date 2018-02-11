@@ -13,6 +13,11 @@ const createUser = (uid, username) => {
   });
 };
 
+const removeUser = (uid) => {
+  firebase.ref(`users/${uid}`).remove();
+};
+
 module.exports = {
   createUser,
+  removeUser,
 };
