@@ -5,6 +5,7 @@ const http = require('http');
 // import the modules
 const { createUser, removeUser } = require('./modules/user');
 const { createRoom } = require('./modules/room');
+const { getWord } = require('./modules/game');
 
 // initialize the server
 const app = express();
@@ -12,12 +13,22 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 /**
- * Connection handler for the websocket
- * @param {Object} socket
- *   the communication channel between the client and the server
- */
+* Connection handler for the websocket
+* @param {Object} socket
+*   the communication channel between the client and the server
+*/
 const onConnection = (socket) => {
-  // client disconnect handler
+// client disconnect handler
+  socket.on('createUser', () => {
+
+  });
+
+  // socket.on('joinRoom', () => {
+  //   socket.join(uid);
+  // });
+
+  socket.on('sendWord', () => console.log(getWord()));
+
   socket.on('disconnect', () => console.log('Client has disconnected'));
 
   // create new user handler
