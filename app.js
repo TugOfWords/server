@@ -1,15 +1,19 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const socketio = require('socket.io');
 const http = require('http');
 
 // import the modules
 const { createUser } = require('./modules/user');
-const { createRoom } = require('./modules/room');
+const { createRoom, roomRouter } = require('./modules/room');
 
 // initialize the server
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+
+app.use(bodyParser.json());
+app.use('/rooms', roomRouter);
 
 /**
  * Connection handler for the websocket

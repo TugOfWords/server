@@ -12,6 +12,7 @@
     "validate": "npm ls"
   },
   "dependencies": {
+    "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "firebase": "^4.9.1",
     "socket.io": "^2.0.4"

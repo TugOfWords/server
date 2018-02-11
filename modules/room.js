@@ -1,16 +1,25 @@
 const firebase = require('../fire');
+const express = require('express');
 
+const roomRouter = express.Router();
 /**
  * Creates a new entry at the /rooms/:id firebase endpoint with the given roomname
  * @param {String} rid
  *   the unique id that identifies the room in our database
  */
-const createRoom = (rid) => {
+const createRoom = (rid, owner) => {
   firebase.ref(`rooms/${rid}`).set({
     active: true,
+    owner,
   });
 };
 
+roomRouter.post('/createRoom', (req, res) => {
+  createRoom(req.body.rid, req.body.uid);
+  res.send({ message: 'Success' });
+});
+
 module.exports = {
   createRoom,
+  roomRouter,
 };
