@@ -4,8 +4,8 @@ const socketio = require('socket.io');
 const http = require('http');
 
 // import the modules
-const { createUser } = require('./modules/user');
 const { createRoom, roomRouter } = require('./modules/room');
+const { createUser, removeUser } = require('./modules/user');
 
 // initialize the server
 const app = express();
@@ -26,6 +26,9 @@ const onConnection = (socket) => {
 
   // create new user handler
   socket.on('createUser', data => createUser(data.uid, data.username));
+
+  // remove user from database
+  socket.on('removeUser', data => removeUser(data.uid));
 
   // create new room handler
   socket.on('createRoom', data => createRoom(data.rid));
