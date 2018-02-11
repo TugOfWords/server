@@ -1,13 +1,12 @@
 const express = require('express');
 const socketio = require('socket.io');
 const http = require('http');
+//const randomWords = require('random-words');
 
 // initialize the server
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
-
-var randomWords = require('random-words')
 
 /**
 * Connection handler for the websocket
@@ -25,7 +24,7 @@ const onConnection = (socket) => {
   // });
 
   socket.on('sendWord', () => {
-    //TODO: uncomment and send getWord()
+    //  TODO: uncomment and send getWord()
   });
 
   socket.on('disconnect', () => console.log('Client has disconnected'));
