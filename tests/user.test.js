@@ -6,9 +6,9 @@ describe('Tests for user module', () => {
   it('should create a user in the firebase database', () => {
     const dummyId = 'create-user-test-id';
     createUser(dummyId, 'create-user-test');
-    let currUser = firebase.ref(`users/${dummyId}`);
-    if(!currUser){
-      assert(NULL)
+    const currUser = firebase.ref(`users/${dummyId}`);
+    if (!currUser) {
+      assert(null);
     }
     firebase.ref(`users/${dummyId}`).remove();
   });
