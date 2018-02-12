@@ -23,7 +23,7 @@ describe('Tests for user module', () => {
 
     removeUser(dummyId);
 
-    // TODO: check that the user was actually removed on firebase
+    firebase.ref(`users/${dummyId}`);
   });
 
   it('should fail to remove an non-existant user without error', () => {
