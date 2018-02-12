@@ -27,6 +27,7 @@ describe('Tests for user module', () => {
   });
 
   it('should fail to remove an non-existant user without error', () => {
-    // TODO
+    const dummyId = 'remove-fake-user-test-id';
+    removeUser(dummyId);
   });
 });
