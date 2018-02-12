@@ -1,3 +1,4 @@
+const assert = require('assert');
 const firebase = require('../fire');
 const { createUser, removeUser } = require('../modules/user');
 
@@ -5,8 +6,10 @@ describe('Tests for user module', () => {
   it('should create a user in the firebase database', () => {
     const dummyId = 'create-user-test-id';
     createUser(dummyId, 'create-user-test');
-    // TODO: check that the user was actually created on firebase
-
+    const currUser = firebase.ref(`users/${dummyId}`);
+    if (!currUser) {
+      assert(null);
+    }
     firebase.ref(`users/${dummyId}`).remove();
   });
 
@@ -20,10 +23,11 @@ describe('Tests for user module', () => {
 
     removeUser(dummyId);
 
-    // TODO: check that the user was actually removed on firebase
+    firebase.ref(`users/${dummyId}`);
   });
 
   it('should fail to remove an non-existant user without error', () => {
-    // TODO
+    const dummyId = 'remove-fake-user-test-id';
+    removeUser(dummyId);
   });
 });
