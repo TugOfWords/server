@@ -1,7 +1,7 @@
 const assert = require('assert');
-// const firebase = require('../fire');
-const { getWord } = require('../modules/game');
-// const { createUser } = require('../modules/user');
+const firebase = require('../fire');
+const { getWord, addPoint, removePoint } = require('../modules/game');
+const { createUser } = require('../modules/user');
 
 describe('Tests for game module', () => {
   it('should create random words', () => {
@@ -29,34 +29,36 @@ describe('Tests for game module', () => {
     }
   });
 
-//   it('should add points to certain user', () => {
-//     const dummyId = 'add-point-test-user-id';
-//     createUser(dummyId, 'add-point-test-user');
-//     let bPoints = firebase.ref(`users/${dummyId}/points`);
-//     //console.log(bPoints);
-//     //addPoint(dummyId);
-//     let aPoints = firebase.ref(`users/${dummyId}/points`);
-//     //console.log(aPoints);
+  it('should add points to certain user', () => {
+    const dummyId = 'add-point-test-user-id';
+    createUser(dummyId, 'add-point-test-user');
+    return firebase.ref(`users/${dummyId}`).once('value').then((snapshot) => {
+      const bPoints = snapshot.val().points;
+      addPoint(dummyId);
+      return firebase.ref(`users/${dummyId}`).once('value').then((snapshot2) => {
+        const aPoints = snapshot2.val().points;
+        if ((aPoints - bPoints) !== 1) {
+          assert(null);
+        }
+        // firebase.ref(`users/${dummyId}`).remove();
+      });
+    });
+  });
 
-//     if ((aPoints - bPoints) != 1) {
-//       assert(null);
-//     }
-//     //firebase.ref(`users/${dummyId}`).remove();
-//   });
-
-//   it('should remove points to certain user', () => {
-//     const dummyId = 'remove-point-test-user-id';
-//     createUser(dummyId, 'remove-point-test-user');
-//     let bPoints = firebase.ref(`users/${dummyId}/points`);
-//     //console.log(bPoints);
-//     //removePoint(dummyId);
-//     let aPoints = firebase.ref(`users/${dummyId}/points`);
-//     //console.log(aPoints);
-
-//     if ((aPoints - bPoints) != -1) {
-//       assert(null);
-//     }
-//     //firebase.ref(`users/${dummyId}`).remove();
-//   });
+  it('should remove points to certain user', () => {
+    const dummyId = 'remove-point-test-user-id';
+    createUser(dummyId, 'remove-point-test-user');
+    return firebase.ref(`users/${dummyId}`).once('value').then((snapshot) => {
+      const bPoints = snapshot.val().points;
+      removePoint(dummyId);
+      return firebase.ref(`users/${dummyId}`).once('value').then((snapshot2) => {
+        const aPoints = snapshot2.val().points;
+        if ((bPoints - aPoints) !== 1) {
+          assert(null);
+        }
+        // firebase.ref(`users/${dummyId}`).remove();
+      });
+    });
+  });
 });
 
