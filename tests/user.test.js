@@ -1,6 +1,6 @@
 const assert = require('assert');
 const firebase = require('../fire');
-const { createUser, removeUser } = require('../modules/user');
+const { createUser } = require('../modules/user');
 
 describe('Tests for user module', () => {
   it('should create a user in the firebase database', () => {
@@ -10,24 +10,24 @@ describe('Tests for user module', () => {
     if (!currUser) {
       assert(null);
     }
-    firebase.ref(`users/${dummyId}`).remove();
+    // firebase.ref(`users/${dummyId}`).remove();
   });
 
-  it('should remove a user in the firebase database', () => {
-    const dummyId = 'remove-user-test-id';
+  // it('should remove a user in the firebase database', () => {
+  //   const dummyId = 'remove-user-test-id';
 
-    // Add a dummy user to remove
-    firebase.ref(`users/${dummyId}`).set({
-      username: 'remove-user-test',
-    });
+  //   // Add a dummy user to remove
+  //   firebase.ref(`users/${dummyId}`).set({
+  //     username: 'remove-user-test',
+  //   });
 
-    removeUser(dummyId);
+  //   removeUser(dummyId);
 
-    firebase.ref(`users/${dummyId}`);
-  });
+  //   firebase.ref(`users/${dummyId}`);
+  // });
 
-  it('should fail to remove an non-existant user without error', () => {
-    const dummyId = 'remove-fake-user-test-id';
-    removeUser(dummyId);
-  });
+  // it('should fail to remove an non-existant user without error', () => {
+  //   const dummyId = 'remove-fake-user-test-id';
+  //   removeUser(dummyId);
+  // });
 });
