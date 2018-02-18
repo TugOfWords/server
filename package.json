@@ -17,6 +17,7 @@
     "express": "^4.16.2",
     "firebase": "^4.9.1",
     "random-words": "^1.0.0",
+    "rword": "^2.2.0",
     "socket.io": "^2.0.4"
   },
   "devDependencies": {

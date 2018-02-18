@@ -4,19 +4,20 @@ const { getWord, addPoint, removePoint } = require('../modules/game');
 const { createUser } = require('../modules/user');
 
 describe('Tests for game module', () => {
+  const n = 1000;
   it('should create random words', () => {
     const words = [];
     let i = 0;
-    while (i < 100) {
+    while (i < n) {
       const randWord = getWord();
       words.push(randWord);
       i += 1;
     }
     let dups = 0;
     let j = 0;
-    while (j < 100) {
+    while (j < n) {
       let k = 0;
-      while (k < 100) {
+      while (k < n) {
         if (words[j] === words[k]) {
           dups += 1;
         }
@@ -24,7 +25,9 @@ describe('Tests for game module', () => {
       }
       j += 1;
     }
-    if (dups < 100 || dups > 110) {
+    const d = (dups - n) / 2;
+    const x = n * 0.005;
+    if (d >= x) {
       assert(null);
     }
   });
@@ -37,7 +40,6 @@ describe('Tests for game module', () => {
       addPoint(dummyId);
       return firebase.ref(`users/${dummyId}`).once('value').then((snapshot2) => {
         const aPoints = snapshot2.val().points;
-        console.log(aPoints - bPoints);
         if ((aPoints - bPoints) !== 1) {
           assert(null);
         }
@@ -54,7 +56,6 @@ describe('Tests for game module', () => {
       removePoint(dummyId);
       return firebase.ref(`users/${dummyId}`).once('value').then((snapshot2) => {
         const aPoints = snapshot2.val().points;
-        console.log(bPoints - aPoints);
         if ((bPoints - aPoints) !== 1) {
           assert(null);
         }

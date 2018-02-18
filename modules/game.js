@@ -1,4 +1,4 @@
-const randomWords = require('random-words');
+const randomWords = require('rword');
 const firebase = require('../fire');
 
 /**
@@ -6,7 +6,7 @@ const firebase = require('../fire');
  * @returns {String}
  *   the generated word
  */
-const getWord = () => randomWords();
+const getWord = () => randomWords.generate();
 
 /**
  * Adds a point for the user at the users/{uid} endpoint
