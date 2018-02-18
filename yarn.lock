@@ -599,6 +599,10 @@ cryptiles@2.x.x:
   dependencies:
     boom "2.x.x"
 
+crypto-random@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/crypto-random/-/crypto-random-1.0.3.tgz#c04179d1cd6439f5b51a19997279f24ddb48c208"
+
 damerau-levenshtein@^1.0.0:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/damerau-levenshtein/-/damerau-levenshtein-1.0.4.tgz#03191c432cb6eea168bb77f3a55ffdccb8978514"
@@ -2051,6 +2055,12 @@ run-async@^2.2.0:
   resolved "https://registry.yarnpkg.com/run-async/-/run-async-2.3.0.tgz#0371ab4ae0bdd720d4166d7dfda64ff7a445a6c0"
   dependencies:
     is-promise "^2.1.0"
+
+rword@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/rword/-/rword-2.2.0.tgz#e5d5d04ba71ed182ad6c04ebfa74d1fa0847e5fd"
+  dependencies:
+    crypto-random "^1.0.3"
 
 rx-lite-aggregates@^4.0.8:
   version "4.0.8"
