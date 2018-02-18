@@ -7,7 +7,7 @@ const cors = require('cors');
 // import the modules
 const { createRoom, roomRouter } = require('./modules/room');
 const { createUser, removeUser, userRouter } = require('./modules/user');
-const { getWord } = require('./modules/game');
+const { getWord, addPoint, removePoint } = require('./modules/game');
 
 // initialize the server
 const app = express();
@@ -37,6 +37,12 @@ const onConnection = (socket) => {
 
   // create new room handler
   socket.on('createRoom', data => createRoom(data.rid));
+
+  // remove a point for a user
+  socket.on('removePoint', data => removePoint(data.uid));
+
+  // add a point for a user
+  socket.on('addPoint', data => addPoint(data.uid));
 };
 
 // initialize socket handler
