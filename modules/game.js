@@ -20,8 +20,21 @@ const addPoint = (uid) => {
   currUser.update({ points: currUserPoints });
 };
 
+/**
+ * Removes a point for the user at the users/{uid} endpoint
+ * @param {String} uid
+ *   the uid of the user that deserves a point
+ */
+const removePoint = (uid) => {
+  let currUserPoints = firebase.ref(`users/${uid}/points`);
+  const currUser = firebase.ref(`users/${uid}`);
+  currUserPoints -= 1;
+  currUser.update({ points: currUserPoints });
+};
+
 
 module.exports = {
   getWord,
   addPoint,
+  removePoint,
 };
