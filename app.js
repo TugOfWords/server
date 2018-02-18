@@ -20,11 +20,29 @@ app.use('/rooms', roomRouter);
 app.use('/users', userRouter);
 
 /**
+* Connection middleware for checking room id.
+* @param {Object} socket
+*   the communication channel between the client and the server
+* @param {Object} next
+*   go to the next middlware
+*/
+const checkConnect = (socket, next) => {
+  if (socket.request._query.id === undefined) { // eslint-disable-line no-underscore-dangle
+    console.log('Connection denied: No room id specified.');
+    socket.disconnect();
+  } else {
+    next();
+  }
+};
+
+/**
 * Connection handler for the websocket
 * @param {Object} socket
 *   the communication channel between the client and the server
 */
 const onConnection = (socket) => {
+  console.log(`Connection established for room: ${socket.request._query.id}`); // eslint-disable-line no-underscore-dangle
+
   socket.on('sendWord', () => console.log(getWord()));
 
   socket.on('disconnect', () => console.log('Client has disconnected'));
@@ -37,8 +55,11 @@ const onConnection = (socket) => {
 
   // create new room handler
   socket.on('createRoom', data => createRoom(data.rid));
+
+  socket.on('joinTeam', data => console.log(data));
 };
 
+io.use(checkConnect);
 // initialize socket handler
 io.on('connection', socket => onConnection(socket));
 
