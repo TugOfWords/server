@@ -7,7 +7,6 @@ describe('Tests for game module', () => {
     let i = 0;
     while (i < 100) {
       const randWord = getWord();
-      console.log(randWord);
       words.push(randWord);
       i += 1;
     }
@@ -23,7 +22,6 @@ describe('Tests for game module', () => {
       }
       j += 1;
     }
-    console.log(dups);
     if (dups < 100 || dups > 110) {
       assert(null);
     }
