@@ -37,10 +37,11 @@ describe('Tests for game module', () => {
       addPoint(dummyId);
       return firebase.ref(`users/${dummyId}`).once('value').then((snapshot2) => {
         const aPoints = snapshot2.val().points;
+        console.log(aPoints - bPoints);
         if ((aPoints - bPoints) !== 1) {
           assert(null);
         }
-        // firebase.ref(`users/${dummyId}`).remove();
+        firebase.ref(`users/${dummyId}`).remove();
       });
     });
   });
@@ -53,10 +54,11 @@ describe('Tests for game module', () => {
       removePoint(dummyId);
       return firebase.ref(`users/${dummyId}`).once('value').then((snapshot2) => {
         const aPoints = snapshot2.val().points;
+        console.log(bPoints - aPoints);
         if ((bPoints - aPoints) !== 1) {
           assert(null);
         }
-        // firebase.ref(`users/${dummyId}`).remove();
+        firebase.ref(`users/${dummyId}`).remove();
       });
     });
   });
