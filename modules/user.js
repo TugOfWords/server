@@ -10,8 +10,10 @@ const userRouter = express.Router();
  *   the in game name the user has chosen
  */
 const createUser = (uid, username) => {
+  const points = 0;
   firebase.ref(`users/${uid}`).set({
     username,
+    points,
   });
 };
 
