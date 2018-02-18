@@ -42,7 +42,7 @@ const onConnection = (socket) => {
   socket.on('removePoint', data => removePoint(data.uid));
 
   // add a point for a user
-  socket.on('removePoint', data => addPoint(data.uid));
+  socket.on('addPoint', data => addPoint(data.uid));
 };
 
 // initialize socket handler
