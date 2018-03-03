@@ -6,8 +6,8 @@ const cors = require('cors');
 
 // import the modules
 const {
-  createRoom, roomRouter, removeRoom, joinTeam,
-} = require('./modules/room');
+  createLobby, lobbyRouter, removeLobby, joinTeam,
+} = require('./modules/lobby');
 const { createUser, removeUser, userRouter } = require('./modules/user');
 const {
   sendWord, addPoint, removePoint, verifyWord,
@@ -20,11 +20,11 @@ const io = socketio(server);
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/rooms', roomRouter);
+app.use('/lobbys', lobbyRouter);
 app.use('/users', userRouter);
 
 /**
-* Connection middleware for checking room id.
+* Connection middleware for checking lobby id.
 * @param {Object} socket
 *   the communication channel between the client and the server
 * @param {Object} next
@@ -32,7 +32,7 @@ app.use('/users', userRouter);
 */
 const checkConnect = (socket, next) => {
   if (socket.request._query.id === undefined) {
-    console.log('Connection denied: No room id specified.');
+    console.log('Connection denied: No lobby id specified.');
     socket.disconnect();
   } else {
     next();
@@ -45,16 +45,16 @@ const checkConnect = (socket, next) => {
 *   the communication channel between the client and the server
 */
 const onConnection = (socket) => {
-  const rid = socket.request._query.id;
-  console.log(`Connection established for room: ${rid}`); // eslint-disable-line no-underscore-dangle
+  const lid = socket.request._query.id;
+  console.log(`Connection established for lobby: ${lid}`); // eslint-disable-line no-underscore-dangle
 
-  socket.on('sendWord', data => sendWord(data.rid, data.uid, data.submittedWord, socket)); // need to emit the socket event
+  socket.on('sendWord', data => sendWord(data.lid, data.uid, data.submittedWord, socket)); // need to emit the socket event
 
-  socket.on('verifyWord', data => verifyWord(data.rid, data.uid, data.submittedWord, socket));
+  socket.on('verifyWord', data => verifyWord(data.lid, data.uid, data.submittedWord, socket));
 
 
   socket.on('disconnect', () => {
-    removeRoom(rid);
+    removeLobby(lid);
   });
 
   // create new user handler
@@ -63,13 +63,13 @@ const onConnection = (socket) => {
   // remove user from database
   socket.on('removeUser', data => removeUser(data.uid));
 
-  // create new room handler
-  socket.on('createRoom', data => createRoom(data.rid));
+  // create new lobby handler
+  socket.on('createLobby', data => createLobby(data.lid));
 
   socket.on('joinTeam', (data) => {
     console.log(data);
-    joinTeam(data.team, data.uid, rid);
-    socket.join(rid);
+    joinTeam(data.team, data.uid, lid);
+    socket.join(lid);
   });
   // remove a point for a user
   socket.on('removePoint', data => removePoint(data.uid));
