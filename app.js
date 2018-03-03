@@ -7,7 +7,9 @@ const cors = require('cors');
 // import the modules
 const { createRoom, roomRouter } = require('./modules/room');
 const { createUser, removeUser, userRouter } = require('./modules/user');
-const { getWord, addPoint, removePoint } = require('./modules/game');
+const {
+  sendWord, addPoint, removePoint, verifyWord,
+} = require('./modules/game');
 
 // initialize the server
 const app = express();
@@ -25,7 +27,9 @@ app.use('/users', userRouter);
 *   the communication channel between the client and the server
 */
 const onConnection = (socket) => {
-  socket.on('sendWord', () => console.log(getWord()));
+  socket.on('sendWord', data => sendWord(data.rid, data.uid, data.submittedWord, socket)); // need to emit the socket event
+
+  socket.on('verifyWord', data => verifyWord(data.rid, data.uid, data.submittedWord, socket));
 
   socket.on('disconnect', () => console.log('Client has disconnected'));
 

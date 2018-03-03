@@ -6,7 +6,26 @@ const firebase = require('../fire');
  * @returns {String}
  *   the generated word
  */
-const getWord = () => randomWords.generate();
+const sendWord = (rid, uid, socket) => {
+  const randWord = randomWords.generate();
+  const ref = firebase.ref(`room/${rid}/users/${uid}`);
+  ref.set({ word: randWord });
+  socket.emit('sendWord', { newWord: randWord });
+};
+
+/**
+ * Verifies the submitted word against the word stored
+ * in the user's object in the firebase room
+ * @returns {String}
+ *   the generated word
+ */
+
+const verifyWord = (rid, uid, submittedWord, socket) => {
+  firebase.ref(`room/${rid}/users/${uid}`).once('value').then((snapshot) => {
+    const currWord = snapshot.val().word;
+    socket.emit('verifyWord', { isCorrect: currWord === submittedWord });
+  });
+};
 
 /**
  * Adds a point for the user at the users/{uid} endpoint
@@ -30,7 +49,8 @@ const removePoint = (uid) => {
 
 
 module.exports = {
-  getWord,
+  sendWord,
+  verifyWord,
   addPoint,
   removePoint,
 };
