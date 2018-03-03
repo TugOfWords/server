@@ -14,6 +14,7 @@ const createRoom = (rid, owner) => {
   firebase.ref(`rooms/${rid}`).set({
     active: true,
     owner,
+    users: owner,
   });
 };
 

@@ -45,7 +45,6 @@ const checkConnect = (socket, next) => {
 *   the communication channel between the client and the server
 */
 const onConnection = (socket) => {
-
   const rid = socket.request._query.id;
   console.log(`Connection established for room: ${rid}`); // eslint-disable-line no-underscore-dangle
 
