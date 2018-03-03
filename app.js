@@ -9,7 +9,7 @@ const {
   createRoom, roomRouter, removeRoom, joinTeam,
 } = require('./modules/room');
 const { createUser, removeUser, userRouter } = require('./modules/user');
-const { getWord } = require('./modules/game');
+const { getWord, addPoint, removePoint } = require('./modules/game');
 
 // initialize the server
 const app = express();
@@ -66,6 +66,11 @@ const onConnection = (socket) => {
     joinTeam(data.team, data.uid, rid);
     socket.join(rid);
   });
+  // remove a point for a user
+  socket.on('removePoint', data => removePoint(data.uid));
+
+  // add a point for a user
+  socket.on('addPoint', data => addPoint(data.uid));
 };
 
 io.use(checkConnect);
