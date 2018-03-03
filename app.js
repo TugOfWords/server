@@ -9,7 +9,9 @@ const {
   createRoom, roomRouter, removeRoom, joinTeam,
 } = require('./modules/room');
 const { createUser, removeUser, userRouter } = require('./modules/user');
-const { getWord, addPoint, removePoint } = require('./modules/game');
+const {
+  sendWord, addPoint, removePoint, verifyWord,
+} = require('./modules/game');
 
 // initialize the server
 const app = express();
@@ -43,10 +45,14 @@ const checkConnect = (socket, next) => {
 *   the communication channel between the client and the server
 */
 const onConnection = (socket) => {
+
   const rid = socket.request._query.id;
   console.log(`Connection established for room: ${rid}`); // eslint-disable-line no-underscore-dangle
 
-  socket.on('sendWord', () => console.log(getWord()));
+  socket.on('sendWord', data => sendWord(data.rid, data.uid, data.submittedWord, socket)); // need to emit the socket event
+
+  socket.on('verifyWord', data => verifyWord(data.rid, data.uid, data.submittedWord, socket));
+
 
   socket.on('disconnect', () => {
     removeRoom(rid);
