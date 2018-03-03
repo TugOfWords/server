@@ -1,25 +1,25 @@
 const assert = require('assert');
 const firebase = require('../fire');
-const { createRoom } = require('../modules/room');
+const { createLobby } = require('../modules/lobby');
 
-describe('Tests for room module', () => {
-  it('should create a room in the firebase database', () => {
-    const dummyId = 'create-room-test-id';
-    createRoom(dummyId, 'some-id');
-    const currRoom = firebase.ref(`rooms/${dummyId}`);
-    if (!currRoom) {
+describe('Tests for lobby module', () => {
+  it('should create a lobby in the firebase database', () => {
+    const dummyId = 'create-lobby-test-id';
+    createLobby(dummyId, 'some-id');
+    const currLobby = firebase.ref(`lobbys/${dummyId}`);
+    if (!currLobby) {
       assert(null);
     }
-    firebase.ref(`rooms/${dummyId}`).remove();
+    firebase.ref(`lobbys/${dummyId}`).remove();
   });
 
-  it('should remove a room in the firebase database', () => {
-    const dummyId = 'remove-room-test-id';
+  it('should remove a lobby in the firebase database', () => {
+    const dummyId = 'remove-lobby-test-id';
 
-    // Add a dummy room to remove
-    firebase.ref(`rooms/${dummyId}`).set({
-      username: 'remove-room-test',
+    // Add a dummy lobby to remove
+    firebase.ref(`lobbys/${dummyId}`).set({
+      username: 'remove-lobby-test',
     });
-    firebase.ref(`rooms/${dummyId}`).remove();
+    firebase.ref(`lobbys/${dummyId}`).remove();
   });
 });

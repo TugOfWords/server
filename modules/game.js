@@ -11,22 +11,22 @@ const getWord = () => randomWords.generate();
  * @returns {String}
  *   the generated word
  */
-const sendWord = (rid, uid, socket) => {
+const sendWord = (lid, uid, socket) => {
   const randWord = randomWords.generate();
-  const ref = firebase.ref(`room/${rid}/users/${uid}`);
+  const ref = firebase.ref(`lobby/${lid}/users/${uid}`);
   ref.set({ word: randWord });
   socket.emit('sendWord', { newWord: randWord });
 };
 
 /**
  * Verifies the submitted word against the word stored
- * in the user's object in the firebase room
+ * in the user's object in the firebase lobby
  * @returns {String}
  *   the generated word
  */
 
-const verifyWord = (rid, uid, submittedWord, socket) => {
-  firebase.ref(`room/${rid}/users/${uid}`).once('value').then((snapshot) => {
+const verifyWord = (lid, uid, submittedWord, socket) => {
+  firebase.ref(`lobby/${lid}/users/${uid}`).once('value').then((snapshot) => {
     const currWord = snapshot.val().word;
     socket.emit('verifyWord', { isCorrect: currWord === submittedWord });
   });
