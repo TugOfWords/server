@@ -17,6 +17,28 @@ const createRoom = (rid, owner) => {
   });
 };
 
+const removeRoom = (rid) => {
+  firebase.ref(`rooms/${rid}`).remove();
+};
+
+const joinTeam = (team, uid, rid) => {
+  firebase.ref(`rooms/${rid}/users/${uid}`).set({
+      score: 0,
+      word: "",
+  });
+
+  if(team == 1){
+    firebase.ref(`rooms/${rid}/t1`).set({
+        uid
+    });
+  }else{
+    firebase.ref(`rooms/${rid}/t2`).set({
+      uid
+    });
+  }  
+};
+ 
+
 roomRouter.post('/createRoom', (req, res) => {
   createRoom(req.body.rid, req.body.uid);
   res.send({ message: 'Success' });
@@ -25,4 +47,6 @@ roomRouter.post('/createRoom', (req, res) => {
 module.exports = {
   createRoom,
   roomRouter,
+  joinTeam,
+  removeRoom
 };

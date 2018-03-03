@@ -5,7 +5,7 @@ const http = require('http');
 const cors = require('cors');
 
 // import the modules
-const { createRoom, roomRouter } = require('./modules/room');
+const { createRoom, roomRouter, removeRoom, joinTeam } = require('./modules/room');
 const { createUser, removeUser, userRouter } = require('./modules/user');
 const { getWord } = require('./modules/game');
 
@@ -41,11 +41,14 @@ const checkConnect = (socket, next) => {
 *   the communication channel between the client and the server
 */
 const onConnection = (socket) => {
-  console.log(`Connection established for room: ${socket.request._query.id}`); // eslint-disable-line no-underscore-dangle
+  let rid = socket.request._query.id;
+  console.log(`Connection established for room: ${rid}`); // eslint-disable-line no-underscore-dangle
 
   socket.on('sendWord', () => console.log(getWord()));
 
-  socket.on('disconnect', () => console.log('Client has disconnected'));
+  socket.on('disconnect', () => {
+    removeRoom(rid);
+  });
 
   // create new user handler
   socket.on('createUser', data => createUser(data.uid, data.username));
@@ -56,7 +59,12 @@ const onConnection = (socket) => {
   // create new room handler
   socket.on('createRoom', data => createRoom(data.rid));
 
-  socket.on('joinTeam', data => console.log(data));
+  socket.on('joinTeam', data => {
+    console.log(data);
+    joinTeam(data.team, data.uid, rid);
+    socket.join(rid);
+  });
+
 };
 
 io.use(checkConnect);
