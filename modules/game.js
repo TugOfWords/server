@@ -2,6 +2,11 @@ const randomWords = require('rword');
 const firebase = require('../fire');
 
 /**
+ * Generates a random words for test suite
+ */
+const getWord = () => randomWords.generate();
+
+/**
  * Generates a random word
  * @returns {String}
  *   the generated word
@@ -53,4 +58,5 @@ module.exports = {
   verifyWord,
   addPoint,
   removePoint,
+  getWord,
 };
