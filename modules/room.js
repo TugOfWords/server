@@ -23,21 +23,21 @@ const removeRoom = (rid) => {
 
 const joinTeam = (team, uid, rid) => {
   firebase.ref(`rooms/${rid}/users/${uid}`).set({
-      score: 0,
-      word: "",
+    score: 0,
+    word: '',
   });
 
-  if(team == 1){
+  if (team === 1) {
     firebase.ref(`rooms/${rid}/t1`).set({
-        uid
+      uid,
     });
-  }else{
+  } else {
     firebase.ref(`rooms/${rid}/t2`).set({
-      uid
+      uid,
     });
-  }  
+  }
 };
- 
+
 
 roomRouter.post('/createRoom', (req, res) => {
   createRoom(req.body.rid, req.body.uid);
@@ -48,5 +48,5 @@ module.exports = {
   createRoom,
   roomRouter,
   joinTeam,
-  removeRoom
+  removeRoom,
 };

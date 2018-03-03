@@ -5,7 +5,9 @@ const http = require('http');
 const cors = require('cors');
 
 // import the modules
-const { createRoom, roomRouter, removeRoom, joinTeam } = require('./modules/room');
+const {
+  createRoom, roomRouter, removeRoom, joinTeam,
+} = require('./modules/room');
 const { createUser, removeUser, userRouter } = require('./modules/user');
 const { getWord } = require('./modules/game');
 
@@ -27,7 +29,7 @@ app.use('/users', userRouter);
 *   go to the next middlware
 */
 const checkConnect = (socket, next) => {
-  if (socket.request._query.id === undefined) { // eslint-disable-line no-underscore-dangle
+  if (socket.request._query.id === undefined) {
     console.log('Connection denied: No room id specified.');
     socket.disconnect();
   } else {
@@ -41,7 +43,7 @@ const checkConnect = (socket, next) => {
 *   the communication channel between the client and the server
 */
 const onConnection = (socket) => {
-  let rid = socket.request._query.id;
+  const rid = socket.request._query.id;
   console.log(`Connection established for room: ${rid}`); // eslint-disable-line no-underscore-dangle
 
   socket.on('sendWord', () => console.log(getWord()));
@@ -59,12 +61,11 @@ const onConnection = (socket) => {
   // create new room handler
   socket.on('createRoom', data => createRoom(data.rid));
 
-  socket.on('joinTeam', data => {
+  socket.on('joinTeam', (data) => {
     console.log(data);
     joinTeam(data.team, data.uid, rid);
     socket.join(rid);
   });
-
 };
 
 io.use(checkConnect);
