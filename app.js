@@ -31,15 +31,27 @@ const onConnection = (socket) => {
   console.log(`Connection established for lobby: ${lid}`); // eslint-disable-line no-underscore-dangle
 
   /* LOBBY */
-  socket.on('joinLobby', data => lobby.joinLobby(data.lid, data.uid));
+  socket.on('joinLobby', async (data) => {
+    if (lobby.joinLobby(data.lid, data.uid)) {
+      const teams = await lobby.getTeams(data.lid);
+      socket.emit(`user joined lobby ${data.lid}`, teams);
+    }
+  });
   socket.on('leaveLobby', (data) => {
     lobby.leaveLobby(data.lid, data.uid);
     socket.disconnect();
   });
-  socket.on('joinTeam', (data) => {
-    lobby.joinTeam(data.lid, data.teamNumber, data.uid);
+  socket.on('joinTeam', async (data) => {
+    if (lobby.joinTeam(data.lid, data.teamNumber, data.uid)) {
+      const teams = await lobby.getTeams(data.lid);
+      socket.emit(`user joined team ${data.lid}`, teams);
+    }
   });
-  socket.on('leaveTeam', data => lobby.leaveTeam(data.lid, data.uid));
+  socket.on('leaveTeam', (data) => {
+    if (lobby.leaveTeam(data.lid, data.uid)) {
+      socket.emit(`user left team ${data.lid}`, { message: 'from leaveTeam' });
+    }
+  });
 
   /* GAME */
   socket.on('sendWord', data => game.sendWord(data.lid, data.uid, data.submittedWord, socket));
@@ -62,7 +74,7 @@ const checkConnect = (socket, next) => {
     console.log('Connection denied: No lobby id specified.');
     socket.disconnect();
   } else {
-    // validate that the room exists
+    // validate that the Lobby exists
     firebase.ref(`/lobbys/${lid}`).once('value')
       .then((snapshot) => {
         const exists = (snapshot.val() !== null);
