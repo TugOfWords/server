@@ -20,12 +20,11 @@ app.use(bodyParser.json());
 app.use('/lobbys', lobby.lobbyRouter);
 app.use('/users', user.userRouter);
 
-
 /**
-* Connection handler for the websocket
-* @param {Object} socket
-*   the communication channel between the client and the server
-*/
+ * Connection handler for the websocket
+ * @param {Object} socket
+ *   the communication channel between the client and the server
+ */
 const onConnection = (socket) => {
   const lid = socket.request._query.id;
   console.log(`Connection established for lobby: ${lid}`); // eslint-disable-line no-underscore-dangle
@@ -34,7 +33,7 @@ const onConnection = (socket) => {
   socket.on('joinLobby', async (data) => {
     if (lobby.joinLobby(data.lid, data.uid)) {
       const teams = await lobby.getTeams(data.lid);
-      socket.emit(`user joined lobby ${data.lid}`, teams);
+      io.sockets.emit(`user joined lobby ${data.lid}`, teams);
     }
   });
   socket.on('leaveLobby', (data) => {
@@ -44,12 +43,12 @@ const onConnection = (socket) => {
   socket.on('joinTeam', async (data) => {
     if (lobby.joinTeam(data.lid, data.teamNumber, data.uid)) {
       const teams = await lobby.getTeams(data.lid);
-      socket.emit(`user joined team ${data.lid}`, teams);
+      io.sockets.emit(`user joined team ${data.lid}`, teams);
     }
   });
   socket.on('leaveTeam', (data) => {
     if (lobby.leaveTeam(data.lid, data.uid)) {
-      socket.emit(`user left team ${data.lid}`, { message: 'from leaveTeam' });
+      io.sockets.emit(`user left team ${data.lid}`, { message: 'from leaveTeam' });
     }
   });
 
@@ -61,12 +60,12 @@ const onConnection = (socket) => {
 };
 
 /**
-* Connection middleware for checking lobby id.
-* @param {Object} socket
-*   the communication channel between the client and the server
-* @param {Object} next
-*   go to the next middlware
-*/
+ * Connection middleware for checking lobby id.
+ * @param {Object} socket
+ *   the communication channel between the client and the server
+ * @param {Object} next
+ *   go to the next middlware
+ */
 const checkConnect = (socket, next) => {
   console.log('checking connection...');
   const lid = socket.request._query.id;
