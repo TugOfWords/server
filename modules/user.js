@@ -1,7 +1,8 @@
-const firebase = require('../fire');
 const express = require('express');
+const firebase = require('../fire');
 
 const userRouter = express.Router();
+
 /**
  * Creates a new entry at the /users/:id firebase endpoint with the given username
  * @param {String} uid
@@ -16,6 +17,8 @@ const createUser = (uid, username) => {
     points,
   });
 };
+
+/* API ROUTES */
 
 userRouter.post('/createUser', (req, res) => {
   createUser(req.body.uid, req.body.username);
