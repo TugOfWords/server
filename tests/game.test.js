@@ -27,7 +27,7 @@ describe('Tests for game module', () => {
       j += 1;
     }
     const d = (dups - n) / 2;
-    const x = n * 0.005;
+    const x = n * 0.01;
     if (d > x) {
       assert(null);
     }
