@@ -51,6 +51,8 @@ describe('Tests for game module', () => {
     if ((ap.points - bp) !== 1) {
       assert(null);
     }
+    firebase.ref(`/lobbys/${lid}`).remove();
+    firebase.ref(`/users/${uid}`).remove();
   });
 
   it('should remove points to a certain user', async () => {
@@ -71,5 +73,7 @@ describe('Tests for game module', () => {
     if ((bp - ap.points) !== 1) {
       assert(null);
     }
+    firebase.ref(`/lobbys/${lid}`).remove();
+    firebase.ref(`/users/${uid}`).remove();
   });
 });
