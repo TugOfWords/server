@@ -11,9 +11,9 @@ const getWord = () => randomWords.generate();
  * @returns {String}
  *   the generated word
  */
-const sendWord = (lid, uid, socket) => {
+const sendWord = async (lid, uid, socket) => {
   const randWord = randomWords.generate();
-  const ref = firebase.ref(`lobby/${lid}/users/${uid}`);
+  const ref = await firebase.ref(`/lobbys/${lid}/users/${uid}`);
   ref.set({ word: randWord });
   socket.emit('sendWord', { newWord: randWord });
 };
@@ -25,31 +25,45 @@ const sendWord = (lid, uid, socket) => {
  *   the generated word
  */
 
-const verifyWord = (lid, uid, submittedWord, socket) => {
-  firebase.ref(`lobby/${lid}/users/${uid}`).once('value').then((snapshot) => {
+const verifyWord = async (lid, uid, submittedWord, socket) => {
+  firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snapshot) => {
     const currWord = snapshot.val().word;
     socket.emit('verifyWord', { isCorrect: currWord === submittedWord });
   });
 };
 
 /**
- * Adds a point for the user at the users/{uid} endpoint
+ * Adds a point for the user at the lobby/${lid}/users/${uid} endpoint
  * @param {String} uid
  *   the uid of the user that deserves a point
+ * @param {String} lid
+ *   the lid of the lobby that the user is in
  */
-const addPoint = (uid) => {
-  const ref = firebase.ref(`users/${uid}/points`);
-  ref.transaction(currPoints => (currPoints || 0) + 1);
+const addPoint = async (lid, uid) => {
+  let bp;
+  await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
+    bp = snap.val().points;
+    firebase.ref(`/lobbys/${lid}/users/${uid}/points`).set({
+      points: bp + 1,
+    });
+  });
 };
 
 /**
- * Removes a point for the user at the users/{uid} endpoint
+ * Removes a point for the user at the lobby/${lid}/users/${uid} endpoint
  * @param {String} uid
  *   the uid of the user that deserves a point
+ * @param {String} lid
+ *   the lid of the lobby that the user is in
  */
-const removePoint = (uid) => {
-  const ref = firebase.ref(`users/${uid}/points`);
-  ref.transaction(currPoints => (currPoints || 0) - 1);
+const removePoint = async (lid, uid) => {
+  let bp;
+  await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
+    bp = snap.val().points;
+    firebase.ref(`/lobbys/${lid}/users/${uid}/points`).set({
+      points: bp - 1,
+    });
+  });
 };
 
 
