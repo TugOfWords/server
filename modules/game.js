@@ -40,9 +40,12 @@ const verifyWord = async (lid, uid, submittedWord, socket) => {
  *   the lid of the lobby that the user is in
  */
 const addPoint = async (lid, uid) => {
-  const snapshot = await firebase.ref(`/lobbys/${lid}/users/${uid}/points`);
-  await firebase.ref(`/lobbys/${lid}/users/${uid}/points`).set({
-    points: snapshot.val().points + 1,
+  let bp;
+  await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
+    bp = snap.val().points;
+    firebase.ref(`/lobbys/${lid}/users/${uid}/points`).set({
+      points: bp + 1,
+    });
   });
 };
 
@@ -54,9 +57,12 @@ const addPoint = async (lid, uid) => {
  *   the lid of the lobby that the user is in
  */
 const removePoint = async (lid, uid) => {
-  const snapshot = await firebase.ref(`/lobbys/${lid}/users/${uid}/points`);
-  await firebase.ref(`/lobbys/${lid}/users/${uid}/points`).set({
-    points: snapshot.val().points - 1,
+  let bp;
+  await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
+    bp = snap.val().points;
+    firebase.ref(`/lobbys/${lid}/users/${uid}/points`).set({
+      points: bp - 1,
+    });
   });
 };
 

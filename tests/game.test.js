@@ -1,8 +1,8 @@
 const assert = require('assert');
-// const firebase = require('../fire');
-const { getWord } = require('../modules/game');
-// const { createUser } = require('../modules/user');
-// const { createLobby, joinLobby } = require('../modules/lobby');
+const firebase = require('../fire');
+const { getWord, addPoint, removePoint } = require('../modules/game');
+const { createUser } = require('../modules/user');
+const { createLobby, joinLobby } = require('../modules/lobby');
 
 describe('Tests for game module', () => {
   const n = 1000;
@@ -33,51 +33,43 @@ describe('Tests for game module', () => {
     }
   });
 
-  // it('should add points to certain user', () => {
-  //   const dummyUid = 'add-point-test-user-id';
-  //   const dummyLid = 'add-point-test-lobby-id';
-  //   createUser(dummyUid, 'add-point-test-user');
-  //   createLobby(dummyLid, dummyUid);
-  //   joinLobby(dummyLid, dummyUid);
-  //   return firebase.ref(`/lobbys/${dummyLid}/users/${dummyUid}`).once
-  // ('value').then((snapshot) => {
-  //     const bPoints = snapshot.val().points;
-  //     addPoint(dummyLid, dummyUid);
-  //     return firebase.ref(`/lobbys/${dummyLid}/users/${dummyUid}`).once
-  // ('value').then((snapshot2) => {
-  //       const aPoints = snapshot2.val().points;
-  //       console.log(aPoints);
-  //       console.log(bPoints);
-  //       if ((aPoints - bPoints) !== 1) {
-  //         assert(null);
-  //       }
-  //       firebase.ref(`users/${dummyUid}`).remove();
-  //       firebase.ref(`lobby/${dummyLid}`).remove();
-  //     });
-  //   });
-  // });
-  //
-  // it('should remove points to certain user', () => {
-  //   const dummyUid = 'remove-point-test-user-id';
-  //   const dummyLid = 'remove-point-test-lobby-id';
-  //   createUser(dummyUid, 'remove-point-test-user');
-  //   createLobby(dummyLid, dummyUid);
-  //   joinLobby(dummyLid, dummyUid);
-  //   return firebase.ref(`/lobbys/${dummyLid}/users/${dummyUid}`).once
-  // ('value').then((snapshot) => {
-  //     const bPoints = snapshot.val().points;
-  //     removePoint(dummyLid, dummyUid);
-  //     return firebase.ref(`/lobbys/${dummyLid}/users/${dummyUid}`).once
-  // ('value').then((snapshot2) => {
-  //       const aPoints = snapshot2.val().points;
-  //       console.log(aPoints);
-  //       console.log(bPoints);
-  //       if ((bPoints - aPoints) !== 1) {
-  //         assert(null);
-  //       }
-  //       firebase.ref(`users/${dummyUid}`).remove();
-  //       firebase.ref(`users/${dummyLid}`).remove();
-  //     });
-  //   });
-  // });
+  it('should add points to a certain user', async () => {
+    const uid = 'add-point-test-uid';
+    const lid = 'add-point-test-lid';
+    createUser(uid, 'add-points-test-username');
+    createLobby(lid, uid);
+    joinLobby(lid, uid);
+    let bp;
+    await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
+      bp = snap.val().points;
+    });
+    await addPoint(lid, uid);
+    let ap;
+    await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap2) => {
+      ap = snap2.val().points;
+    });
+    if ((ap.points - bp) !== 1) {
+      assert(null);
+    }
+  });
+
+  it('should remove points to a certain user', async () => {
+    const uid = 'remove-point-test-uid';
+    const lid = 'remove-point-test-lid';
+    createUser(uid, 'remove-points-test-username');
+    createLobby(lid, uid);
+    joinLobby(lid, uid);
+    let bp;
+    await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
+      bp = snap.val().points;
+    });
+    await removePoint(lid, uid);
+    let ap;
+    await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap2) => {
+      ap = snap2.val().points;
+    });
+    if ((bp - ap.points) !== 1) {
+      assert(null);
+    }
+  });
 });
