@@ -36,6 +36,11 @@ const onConnection = (socket) => {
       io.sockets.emit(`user joined lobby ${data.lid}`, teams);
     }
   });
+  socket.on('joinPublicLobby', async (data) => {
+    lobby.joinPublicLobby(data.uid);
+    const teams = await lobby.getTeams(data.lid);
+    io.sockets.emit(`user joined lobby ${data.lid}`, teams);
+  });
   socket.on('leaveLobby', (data) => {
     lobby.leaveLobby(data.lid, data.uid);
     socket.disconnect();
@@ -66,20 +71,22 @@ const onConnection = (socket) => {
  * @param {Object} next
  *   go to the next middlware
  */
-const checkConnect = (socket, next) => {
+const checkConnect = async (socket, next) => {
   console.log('checking connection...');
   const lid = socket.request._query.id;
   if (lid === undefined) {
     console.log('Connection denied: No lobby id specified.');
     socket.disconnect();
   } else {
-    // validate that the Lobby exists
-    firebase.ref(`/lobbys/${lid}`).once('value')
-      .then((snapshot) => {
-        const exists = (snapshot.val() !== null);
-        if (exists) next();
-        console.log(`Lobby ${lid} does not exist`);
-      });
+    const lobbyRef = await firebase.ref(`/lobbys/${lid}`).once('value');
+    const exists = (lobbyRef.val() !== null);
+    if (exists) {
+      const usersRef = await firebase.ref(`/lobbys${lid}/users`).once('value');
+      if (Object.keys(usersRef).length < 50) next();
+      else console.log(`Lobby ${lid} is full`);
+    } else {
+      console.log(`Lobby ${lid} does not exist`);
+    }
   }
 };
 

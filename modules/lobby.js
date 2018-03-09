@@ -1,7 +1,11 @@
+const shortid = require('shortid');
 const express = require('express');
 const firebase = require('../fire');
 
 const lobbyRouter = express.Router();
+
+let pLobbyCount = 0;
+let pLobbyID = null;
 
 /**
  * Remove an entry at the /lobbys/:lid firebase endpoint
@@ -30,10 +34,10 @@ const createLobby = async (lid, owner) => {
       active: true,
       owner,
     });
-    setTimeout(() => { // remove lobby after 12 hours
-      removeLobby(lid);
-      // ms   s    m    h
-    }, 1000 * 60 * 60 * 12);
+    // setTimeout(() => { // remove lobby after 12 hours
+    // removeLobby(lid);
+    // ms   s    m    h
+    // }, 1000 * 60 * 60 * 12);
     return true;
   } catch (e) {
     return false;
@@ -49,6 +53,9 @@ const createLobby = async (lid, owner) => {
  */
 const joinLobby = async (lid, uid) => {
   try {
+    if (!(await firebase.ref(`/lobbys/${lid}/active`).once('value'))) {
+      return false;
+    }
     await firebase.ref(`/lobbys/${lid}/users/${uid}`).set({
       word: 0,
       points: 0,
@@ -90,7 +97,7 @@ const leaveLobby = async (lid, uid) => {
   try {
     leaveTeam(lid, uid);
     await firebase.ref(`/lobbys/${lid}/${uid}`).remove();
-    await firebase.ref(`/lobbys/${lid}/users/${uid}`);
+    await firebase.ref(`/lobbys/${lid}/users/${uid}`).remove();
     return true;
   } catch (e) {
     return false;
@@ -132,11 +139,39 @@ const getTeams = async (lid) => {
   return teams;
 };
 
+const createPublicLobby = () => {
+  pLobbyID = `p_${encodeURIComponent(shortid.generate())}`;
+  createLobby(pLobbyID, null);
+  pLobbyCount = 0;
+};
+
+/**
+ * returns the first available public lobby lid and creates one if there are none
+ */
+const joinPublicLobby = async (uid) => {
+  if (pLobbyID === null || pLobbyCount > 49) {
+    createPublicLobby();
+  }
+  if (joinLobby(pLobbyID, uid)) {
+    pLobbyCount += 1;
+  } else {
+    createPublicLobby();
+    joinPublicLobby(uid);
+  }
+};
+
 /* API ROUTES */
 
 lobbyRouter.post('/createLobby', (req, res) => {
   createLobby(req.body.lid, req.body.uid);
   res.send({ message: 'Success' });
+});
+
+lobbyRouter.get('/publicLobby', async (req, res) => {
+  if (pLobbyID === null) {
+    createPublicLobby();
+  }
+  res.send({ lid: pLobbyID });
 });
 
 module.exports = {
@@ -148,4 +183,5 @@ module.exports = {
   joinTeam,
   leaveTeam,
   getTeams,
+  joinPublicLobby,
 };
