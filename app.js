@@ -53,8 +53,8 @@ const onConnection = (socket) => {
   });
 
   /* GAME */
-  socket.on('sendWord', data => game.sendWord(data.lid, data.uid, data.submittedWord, socket));
-  socket.on('verifyWord', data => game.verifyWord(data.lid, data.uid, data.submittedWord, socket));
+  socket.on('sendWord', data => socket.emit('sendWord', { newWord: game.sendWord(data.lid, data.uid, data.submittedWord) }));
+  socket.on('verifyWord', data => socket.emit('verifyWord', { isCorrect: game.verifyWord(data.lid, data.uid, data.submittedWord) }));
   socket.on('removePoint', data => game.removePoint(data.uid));
   socket.on('addPoint', data => game.addPoint(data.uid));
 };
