@@ -11,12 +11,13 @@ const getWord = () => randomWords.generate();
  * @returns {String}
  *   the generated word
  */
-const sendWord = async (lid, uid, socket) => {
+const sendWord = async (lid, uid) => {
   const randWord = randomWords.generate();
   const ref = await firebase.ref(`/lobbys/${lid}/users/${uid}`);
   ref.set({ word: randWord });
-  socket.emit('sendWord', { newWord: randWord });
+  return randWord;
 };
+
 
 /**
  * Verifies the submitted word against the word stored
@@ -25,11 +26,12 @@ const sendWord = async (lid, uid, socket) => {
  *   the generated word
  */
 
-const verifyWord = async (lid, uid, submittedWord, socket) => {
-  firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snapshot) => {
-    const currWord = snapshot.val().word;
-    socket.emit('verifyWord', { isCorrect: currWord === submittedWord });
+const verifyWord = async (lid, uid, submittedWord) => {
+  let currWord = '';
+  await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snapshot) => {
+    currWord = snapshot.val().word;
   });
+  return currWord === submittedWord;
 };
 
 /**
@@ -38,6 +40,8 @@ const verifyWord = async (lid, uid, submittedWord, socket) => {
  *   the uid of the user that deserves a point
  * @param {String} lid
  *   the lid of the lobby that the user is in
+ *
+ * unit test exists
  */
 const addPoint = async (lid, uid) => {
   let bp;
@@ -55,6 +59,8 @@ const addPoint = async (lid, uid) => {
  *   the uid of the user that deserves a point
  * @param {String} lid
  *   the lid of the lobby that the user is in
+ *
+ *  unit test exists
  */
 const removePoint = async (lid, uid) => {
   let bp;
