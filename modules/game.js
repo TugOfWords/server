@@ -27,10 +27,11 @@ const sendWord = async (lid, uid) => {
  */
 
 const verifyWord = async (lid, uid, submittedWord) => {
-  firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snapshot) => {
-    const currWord = snapshot.val().word;
-    return currWord === submittedWord;
+  let currWord = '';
+  await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snapshot) => {
+    currWord = snapshot.val().word;
   });
+  return currWord === submittedWord;
 };
 
 /**
