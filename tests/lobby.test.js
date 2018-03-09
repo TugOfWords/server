@@ -66,7 +66,7 @@ describe('Tests for lobby module', async () => {
     createLobby(lid, uid);
     joinLobby(lid, uid);
     joinTeam(lid, 1, uid);
-    firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
+    await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
       if (!snap.val()) {
         assert(null);
       }
@@ -84,7 +84,7 @@ describe('Tests for lobby module', async () => {
     joinLobby(lid, uid);
     joinTeam(lid, 1, uid);
     leaveTeam(lid, uid);
-    firebase.ref(`/lobbys/${lid}/t1/${uid}`).once('value').then((snap) => {
+    await firebase.ref(`/lobbys/${lid}/t1/${uid}`).once('value').then((snap) => {
       if (snap.val()) {
         assert(null);
       }
