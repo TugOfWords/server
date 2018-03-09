@@ -1,6 +1,8 @@
 const assert = require('assert');
 const firebase = require('../fire');
-const { getWord, addPoint, removePoint } = require('../modules/game');
+const {
+  getWord, addPoint, removePoint, sendWord, verifyWord,
+} = require('../modules/game');
 const { createUser } = require('../modules/user');
 const { createLobby, joinLobby } = require('../modules/lobby');
 
@@ -75,5 +77,38 @@ describe('Tests for game module', () => {
     }
     firebase.ref(`/lobbys/${lid}`).remove();
     firebase.ref(`/users/${uid}`).remove();
+  });
+
+  it('should verify that the randomly generated word is correct', async () => {
+    const uid = 'verify-word-test-uid';
+    const lid = 'verify-word-test-lid';
+
+    createUser(uid, 'verify-word-test-username');
+    createLobby(lid, uid);
+    joinLobby(lid, uid);
+    const randWord = await sendWord(lid, uid);
+    const isSameWord = await verifyWord(lid, uid, randWord);
+    if (!isSameWord) {
+      assert(null);
+    }
+    await firebase.ref(`/lobbys/${lid}`).remove();
+    await firebase.ref(`/users/${uid}`).remove();
+  });
+
+  it('should verify that the randomly generated word is NOT correct', async () => {
+    const uid = 'verify-word-test-uid';
+    const lid = 'verify-word-test-lid';
+
+    createUser(uid, 'verify-word-test-username');
+    createLobby(lid, uid);
+    joinLobby(lid, uid);
+    let randWord = await sendWord(lid, uid);
+    randWord += 'abcdefghijlmnopqrstuvwxyz';
+    const isSameWord = await verifyWord(lid, uid, randWord);
+    if (isSameWord) {
+      assert(null);
+    }
+    await firebase.ref(`/lobbys/${lid}`).remove();
+    await firebase.ref(`/users/${uid}`).remove();
   });
 });
