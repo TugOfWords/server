@@ -90,6 +90,7 @@ const leaveLobby = async (lid, uid) => {
   try {
     leaveTeam(lid, uid);
     await firebase.ref(`/lobbys/${lid}/${uid}`).remove();
+    await firebase.ref(`/lobbys/${lid}/users/${uid}`);
     return true;
   } catch (e) {
     return false;
