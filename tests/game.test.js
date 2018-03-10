@@ -5,6 +5,7 @@ const { getWord } = require('../modules/game');
 // const { createUser } = require('../modules/user');
 // const { createLobby, joinLobby } = require('../modules/lobby');
 
+
 describe('Tests for game module', () => {
   const n = 1000;
   it('should create random words', () => {
