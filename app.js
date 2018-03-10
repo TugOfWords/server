@@ -31,15 +31,17 @@ const onConnection = (socket) => {
 
   /* LOBBY */
   socket.on('joinLobby', async (data) => {
-    if (lobby.joinLobby(data.lid, data.uid)) {
+    if (data.isPrivate) {
+      if (lobby.joinLobby(data.lid, data.uid)) {
+        const teams = await lobby.getTeams(data.lid);
+        io.sockets.emit(`user joined lobby ${data.lid}`, teams);
+      }
+    } else {
+      lobby.joinPublicLobby(data.uid);
       const teams = await lobby.getTeams(data.lid);
       io.sockets.emit(`user joined lobby ${data.lid}`, teams);
+      io.sockets.emit(`user joined team ${data.lid}`, teams);
     }
-  });
-  socket.on('joinPublicLobby', async (data) => {
-    lobby.joinPublicLobby(data.uid);
-    const teams = await lobby.getTeams(data.lid);
-    io.sockets.emit(`user joined lobby ${data.lid}`, teams);
   });
   socket.on('leaveLobby', async (data) => {
     lobby.leaveLobby(data.lid, data.uid);
@@ -57,6 +59,10 @@ const onConnection = (socket) => {
     if (lobby.leaveTeam(data.lid, data.uid)) {
       io.sockets.emit(`user left team ${data.lid}`, { message: 'from leaveTeam' });
     }
+  });
+  socket.on('getTeams', async (data) => {
+    const teams = await lobby.getTeams(data.lid);
+    io.sockets.emit(`got teams ${lid}`, teams);
   });
 
   /* GAME */

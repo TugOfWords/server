@@ -4,22 +4,8 @@ const firebase = require('../fire');
 
 const lobbyRouter = express.Router();
 
-let pLobbyCount = 0;
-let pLobbyID = null;
-
-/**
- * Remove an entry at the /lobbys/:lid firebase endpoint
- * @param {string} lid
- *   the unique id that identifies the lobby in firebase
- */
-const removeLobby = async (lid) => {
-  try {
-    await firebase.ref(`/lobbys/${lid}`).remove();
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
+let pLobbyCount = 0; // number of users in the current public lobby
+let pLobbyID = null; // lid of the current public lobby
 
 /**
  * Creates a new entry at the /lobbys/:lid firebase endpoint
@@ -94,6 +80,7 @@ const leaveLobby = async (lid, uid) => {
     leaveTeam(lid, uid);
     await firebase.ref(`/lobbys/${lid}/${uid}`).remove();
     await firebase.ref(`/lobbys/${lid}/users/${uid}`).remove();
+    if (lid === pLobbyID) pLobbyCount -= 1;
     return true;
   } catch (e) {
     return false;
@@ -135,7 +122,7 @@ const getTeams = async (lid) => {
 /**
  * Create a new public lobby and add it to firebase
  */
-const createPublicLobby = () => {
+const createPublicLobby = async () => {
   pLobbyID = `p_${encodeURIComponent(shortid.generate())}`;
   createLobby(pLobbyID, null);
   pLobbyCount = 0;
@@ -145,15 +132,15 @@ const createPublicLobby = () => {
  * returns the first available public lobby lid and creates one if there are none
  */
 const joinPublicLobby = async (uid) => {
-  if (pLobbyID === null || pLobbyCount > 49) {
-    createPublicLobby();
-  }
   if (joinLobby(pLobbyID, uid)) {
     pLobbyCount += 1;
   } else {
     createPublicLobby();
-    joinPublicLobby(uid);
+    await joinPublicLobby(pLobbyID, uid);
   }
+  // auto join team for public lobbys
+  const teamNumber = (pLobbyCount % 2) + 1;
+  await joinTeam(pLobbyID, teamNumber, uid);
 };
 
 /* API ROUTES */
@@ -164,7 +151,8 @@ lobbyRouter.post('/createLobby', (req, res) => {
 });
 
 lobbyRouter.get('/publicLobby', async (req, res) => {
-  if (pLobbyID === null) {
+  const active = (await firebase.ref(`/lobbys/${pLobbyID}/active`).once('value')).val();
+  if (pLobbyID === null || pLobbyCount > 49 || !active) {
     createPublicLobby();
   }
   res.send({ lid: pLobbyID });
@@ -173,7 +161,6 @@ lobbyRouter.get('/publicLobby', async (req, res) => {
 module.exports = {
   lobbyRouter,
   createLobby,
-  removeLobby,
   leaveLobby,
   joinLobby,
   joinTeam,
