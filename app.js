@@ -28,6 +28,8 @@ app.use('/users', user.userRouter);
 const onConnection = (socket) => {
   const lid = socket.request._query.id;
   console.log(`Connection established for lobby: ${lid}`); // eslint-disable-line no-underscore-dangle
+  const countdowns = {};
+  const startTime = 60; // public lobby wait time (seconds)
 
   /* LOBBY */
   socket.on('joinLobby', async (data) => {
@@ -41,18 +43,54 @@ const onConnection = (socket) => {
       const teams = await lobby.getTeams(data.lid);
       io.sockets.emit(`user joined lobby ${data.lid}`, teams);
       io.sockets.emit(`user joined team ${data.lid}`, teams);
+      const lenT1 = Object.keys(teams.t1).length;
+      const lenT2 = Object.keys(teams.t2).length;
+      if (lenT1 === 1 && lenT2 === 1) {
+        // start a lobby countdown
+        io.sockets.emit(`start countdown ${data.lid}`, { seconds: startTime });
+        try {
+          clearInterval(countdowns[data.lid].timer);
+        } catch (e) {
+          // do nothing
+        }
+        countdowns[data.lid] = {
+          seconds: startTime,
+          timer: setInterval(() => {
+            countdowns[data.lid].seconds -= 1;
+            io.sockets.emit(`countdown ${data.lid}`, { seconds: countdowns[data.lid].seconds });
+            if (countdowns[data.lid].seconds === 0) { // countdown has ended
+              clearInterval(countdowns[data.lid].timer);
+              io.sockets.emit(`finish countdown ${data.lid}`);
+            }
+          }, 1000),
+        };
+      }
     }
   });
   socket.on('leaveLobby', async (data) => {
     lobby.leaveLobby(data.lid, data.uid);
     const teams = await lobby.getTeams(data.lid);
     io.sockets.emit(`user left lobby ${data.lid}`, teams);
+    // check if we need to stop a timer
+    if (data.lid.substr(0, 2) === 'p_') {
+      const lenT1 = Object.keys(teams.t1).length;
+      const lenT2 = Object.keys(teams.t2).length;
+      if (lenT1 === 0 || lenT2 === 0) {
+        io.sockets.emit(`stop countdown ${data.lid}`);
+        try {
+          clearInterval(countdowns[data.lid].timer);
+        } catch (e) {
+          // do nothing
+        }
+      }
+    }
     socket.disconnect();
   });
   socket.on('joinTeam', async (data) => {
     if (lobby.joinTeam(data.lid, data.teamNumber, data.uid)) {
       const teams = await lobby.getTeams(data.lid);
       io.sockets.emit(`user joined team ${data.lid}`, teams);
+      // check if we need to start a timer for a public lobby
     }
   });
   socket.on('leaveTeam', (data) => {

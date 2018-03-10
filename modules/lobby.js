@@ -132,14 +132,13 @@ const createPublicLobby = async () => {
  * returns the first available public lobby lid and creates one if there are none
  */
 const joinPublicLobby = async (uid) => {
-  if (joinLobby(pLobbyID, uid)) {
-    pLobbyCount += 1;
-  } else {
+  if (!joinLobby(pLobbyID, uid)) {
     createPublicLobby();
     await joinPublicLobby(pLobbyID, uid);
   }
   // auto join team for public lobbys
   const teamNumber = (pLobbyCount % 2) + 1;
+  pLobbyCount += 1;
   await joinTeam(pLobbyID, teamNumber, uid);
 };
 
