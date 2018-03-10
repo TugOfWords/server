@@ -41,8 +41,10 @@ const onConnection = (socket) => {
     const teams = await lobby.getTeams(data.lid);
     io.sockets.emit(`user joined lobby ${data.lid}`, teams);
   });
-  socket.on('leaveLobby', (data) => {
+  socket.on('leaveLobby', async (data) => {
     lobby.leaveLobby(data.lid, data.uid);
+    const teams = await lobby.getTeams(data.lid);
+    io.sockets.emit(`user left lobby ${data.lid}`, teams);
     socket.disconnect();
   });
   socket.on('joinTeam', async (data) => {

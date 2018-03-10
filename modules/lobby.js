@@ -34,10 +34,6 @@ const createLobby = async (lid, owner) => {
       active: true,
       owner,
     });
-    // setTimeout(() => { // remove lobby after 12 hours
-    // removeLobby(lid);
-    // ms   s    m    h
-    // }, 1000 * 60 * 60 * 12);
     return true;
   } catch (e) {
     return false;
@@ -133,12 +129,12 @@ const joinTeam = async (lid, teamNumber, uid) => {
 const getTeams = async (lid) => {
   const snapshot = await firebase.ref(`/lobbys/${lid}`).once('value');
   const { t1, t2 } = snapshot.val();
-  const teams = {};
-  teams.t1 = t1 || {};
-  teams.t2 = t2 || {};
-  return teams;
+  return { t1: t1 || {}, t2: t2 || {} };
 };
 
+/**
+ * Create a new public lobby and add it to firebase
+ */
 const createPublicLobby = () => {
   pLobbyID = `p_${encodeURIComponent(shortid.generate())}`;
   createLobby(pLobbyID, null);
