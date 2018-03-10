@@ -80,7 +80,6 @@ const onConnection = (socket) => {
  *   go to the next middlware
  */
 const checkConnect = async (socket, next) => {
-  console.log('checking connection...');
   const lid = socket.request._query.id;
   if (lid === undefined) {
     console.log('Connection denied: No lobby id specified.');

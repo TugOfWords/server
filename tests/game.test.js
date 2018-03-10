@@ -42,7 +42,6 @@ describe('Tests for game module', () => {
   //   await joinLobby(lid, uid);
   //   let snapshot = await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value');
   //   const bp = snapshot.val();
-  //   console.log(bp);
   //   await addPoint(lid, uid);
   //   snapshot = await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value');
   //   const ap = snapshot.val().points;
