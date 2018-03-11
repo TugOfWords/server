@@ -1,21 +1,11 @@
+const shortid = require('shortid');
 const express = require('express');
 const firebase = require('../fire');
 
 const lobbyRouter = express.Router();
 
-/**
- * Remove an entry at the /lobbys/:lid firebase endpoint
- * @param {string} lid
- *   the unique id that identifies the lobby in firebase
- */
-const removeLobby = async (lid) => {
-  try {
-    await firebase.ref(`/lobbys/${lid}`).remove();
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
+let pLobbyCount = 0; // number of users in the current public lobby
+let pLobbyID = null; // lid of the current public lobby
 
 /**
  * Creates a new entry at the /lobbys/:lid firebase endpoint
@@ -30,10 +20,6 @@ const createLobby = async (lid, owner) => {
       active: true,
       owner,
     });
-    setTimeout(() => { // remove lobby after 12 hours
-      removeLobby(lid);
-      // ms   s    m    h
-    }, 1000 * 60 * 60 * 12);
     return true;
   } catch (e) {
     return false;
@@ -49,6 +35,9 @@ const createLobby = async (lid, owner) => {
  */
 const joinLobby = async (lid, uid) => {
   try {
+    if (!(await firebase.ref(`/lobbys/${lid}/active`).once('value'))) {
+      return false;
+    }
     await firebase.ref(`/lobbys/${lid}/users/${uid}`).set({
       word: 0,
       points: 0,
@@ -90,7 +79,8 @@ const leaveLobby = async (lid, uid) => {
   try {
     leaveTeam(lid, uid);
     await firebase.ref(`/lobbys/${lid}/${uid}`).remove();
-    await firebase.ref(`/lobbys/${lid}/users/${uid}`);
+    await firebase.ref(`/lobbys/${lid}/users/${uid}`).remove();
+    if (lid === pLobbyID) pLobbyCount -= 1;
     return true;
   } catch (e) {
     return false;
@@ -126,10 +116,30 @@ const joinTeam = async (lid, teamNumber, uid) => {
 const getTeams = async (lid) => {
   const snapshot = await firebase.ref(`/lobbys/${lid}`).once('value');
   const { t1, t2 } = snapshot.val();
-  const teams = {};
-  teams.t1 = t1 || {};
-  teams.t2 = t2 || {};
-  return teams;
+  return { t1: t1 || {}, t2: t2 || {} };
+};
+
+/**
+ * Create a new public lobby and add it to firebase
+ */
+const createPublicLobby = async () => {
+  pLobbyID = `p_${encodeURIComponent(shortid.generate())}`;
+  createLobby(pLobbyID, null);
+  pLobbyCount = 0;
+};
+
+/**
+ * returns the first available public lobby lid and creates one if there are none
+ */
+const joinPublicLobby = async (uid) => {
+  if (!joinLobby(pLobbyID, uid)) {
+    createPublicLobby();
+    await joinPublicLobby(pLobbyID, uid);
+  }
+  // auto join team for public lobbys
+  const teamNumber = (pLobbyCount % 2) + 1;
+  pLobbyCount += 1;
+  await joinTeam(pLobbyID, teamNumber, uid);
 };
 
 /* API ROUTES */
@@ -139,13 +149,21 @@ lobbyRouter.post('/createLobby', (req, res) => {
   res.send({ message: 'Success' });
 });
 
+lobbyRouter.get('/publicLobby', async (req, res) => {
+  const active = (await firebase.ref(`/lobbys/${pLobbyID}/active`).once('value')).val();
+  if (pLobbyID === null || pLobbyCount > 49 || !active) {
+    createPublicLobby();
+  }
+  res.send({ lid: pLobbyID });
+});
+
 module.exports = {
   lobbyRouter,
   createLobby,
-  removeLobby,
   leaveLobby,
   joinLobby,
   joinTeam,
   leaveTeam,
   getTeams,
+  joinPublicLobby,
 };
