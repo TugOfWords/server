@@ -1,7 +1,7 @@
 const assert = require('assert');
 const firebase = require('../fire');
 const {
-  createLobby, removeLobby, joinLobby, leaveLobby, joinTeam, leaveTeam,
+  createLobby, joinLobby, leaveLobby, joinTeam, leaveTeam,
 } = require('../modules/lobby');
 const { createUser } = require('../modules/user');
 
@@ -21,7 +21,7 @@ describe('Tests for lobby module', async () => {
     createUser(uid, 'remove-lobby-test-username');
     const lid = 'remove-lobby-test-id';
     createLobby(lid, uid);
-    if (!removeLobby(lid)) {
+    if (!leaveLobby(lid)) {
       assert(null);
     }
     firebase.ref(`users/${uid}`).remove();
@@ -30,12 +30,15 @@ describe('Tests for lobby module', async () => {
 
   it('should allow users to join a lobby', async () => {
     const uid = 'join-lobby-test-uid';
-    createUser(uid, 'join-lobby-test-username');
+    await createUser(uid, 'join-lobby-test-username');
     const uid2 = 'join-lobby-test-uid2';
-    createUser(uid2, 'join-lobby-test-username2');
+    await createUser(uid2, 'join-lobby-test-username2');
     const lid = 'join-lobby-test-id';
-    createLobby(lid, uid);
-    if (!joinLobby(lid)) {
+    await createLobby(lid, uid);
+    await joinLobby(lid, uid);
+    await joinLobby(lid, uid2);
+    const snapshot = await firebase.ref(`/lobbys/${lid}/users`).once('value');
+    if (!snapshot.val()) {
       assert(null);
     }
     firebase.ref(`users/${uid}`).remove();
@@ -53,7 +56,7 @@ describe('Tests for lobby module', async () => {
     if (!leaveLobby(lid)) {
       assert(null);
     }
-    removeLobby(lid);
+    leaveLobby(lid);
     firebase.ref(`lobbys/${lid}`).remove();
     firebase.ref(`users/${uid}`).remove();
     firebase.ref(`users/${uid2}`).remove();
@@ -66,12 +69,12 @@ describe('Tests for lobby module', async () => {
     createLobby(lid, uid);
     joinLobby(lid, uid);
     joinTeam(lid, 1, uid);
-    await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
+    await firebase.ref(`/lobbys/${lid}`).once('value').then((snap) => {
       if (!snap.val()) {
         assert(null);
       }
     });
-    removeLobby(lid);
+    leaveLobby(lid);
     firebase.ref(`lobbys/${lid}`).remove();
     firebase.ref(`users/${uid}`).remove();
   });
