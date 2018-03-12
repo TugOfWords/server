@@ -30,6 +30,7 @@ const onConnection = (socket) => {
   console.log(`Connection established for lobby: ${lid}`); // eslint-disable-line no-underscore-dangle
   const countdowns = {};
   const startTime = 60; // public lobby wait time (seconds)
+  socket.join(lid);
 
   /* LOBBY */
   socket.on('joinLobby', async (data) => {
@@ -101,6 +102,10 @@ const onConnection = (socket) => {
   socket.on('getTeams', async (data) => {
     const teams = await lobby.getTeams(data.lid);
     io.sockets.emit(`got teams ${lid}`, teams);
+  });
+
+  socket.on('startGame', async () => {
+    io.to(lid).emit('startGame');
   });
 
   /* GAME */
