@@ -72,6 +72,22 @@ const removePoint = async (lid, uid) => {
   });
 };
 
+const whichTeam = async (lid, uid) => {
+  let t1 = false;
+  let t2 = false;
+
+  await firebase.ref(`/lobbys/${lid}/t1/${uid}`).once('value').then((snap) => {
+    t1 = snap.exists();
+  });
+
+  await firebase.ref(`/lobbys/${lid}/t2/${uid}`).once('value').then((snap) => {
+    t2 = snap.exists();
+  });
+
+  if (!t1 && !t2) return 0;
+  return t1 ? 1 : 2;
+};
+
 
 module.exports = {
   sendWord,
@@ -79,4 +95,5 @@ module.exports = {
   addPoint,
   removePoint,
   getWord,
+  whichTeam,
 };

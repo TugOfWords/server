@@ -1,10 +1,10 @@
 const assert = require('assert');
-// const firebase = require('../fire');
-// const { getWord, addPoint, removePoint } = require('../modules/game');
-const { getWord } = require('../modules/game');
-// const { createUser } = require('../modules/user');
-// const { createLobby, joinLobby } = require('../modules/lobby');
-
+const firebase = require('../fire');
+const { getWord, whichTeam } = require('../modules/game');
+const {
+  createLobby, joinLobby, joinTeam,
+} = require('../modules/lobby');
+const { createUser } = require('../modules/user');
 
 describe('Tests for game module', () => {
   const n = 1000;
@@ -33,6 +33,34 @@ describe('Tests for game module', () => {
     if (d > x) {
       assert(null);
     }
+  });
+
+  it('should tell which team a user is in', async () => {
+    const uid = 'which-lobby-test-uid';
+    await createUser(uid, 'which-lobby-test-username');
+    const uid2 = 'which-lobby-test-uid2';
+    await createUser(uid2, 'which-lobby-test-username2');
+    const uid3 = 'which-lobby-test-uid3';
+    await createUser(uid3, 'which-lobby-test-username3');
+
+    const lid = 'which-lobby-test-id';
+    await createLobby(lid, uid);
+    await joinLobby(lid, uid);
+    await joinTeam(lid, 1, uid);
+
+    await joinLobby(lid, uid2);
+    await joinTeam(lid, 2, uid2);
+
+    await joinLobby(lid, uid3);
+
+    assert.strictEqual(await whichTeam(lid, uid), 1);
+    assert.strictEqual(await whichTeam(lid, uid2), 2);
+    assert.strictEqual(await whichTeam(lid, uid3), 0);
+
+    firebase.ref(`users/${uid}`).remove();
+    firebase.ref(`users/${uid2}`).remove();
+    firebase.ref(`users/${uid3}`).remove();
+    firebase.ref(`lobbys/${lid}`).remove();
   });
 
   // it('should add points to a certain user', async () => {

@@ -109,10 +109,20 @@ const onConnection = (socket) => {
   });
 
   /* GAME */
-  socket.on('sendWord', data => socket.emit('sendWord', { newWord: game.sendWord(data.lid, data.uid, data.submittedWord) }));
-  socket.on('verifyWord', data => socket.emit('verifyWord', { isCorrect: game.verifyWord(data.lid, data.uid, data.submittedWord) }));
-  socket.on('removePoint', data => game.removePoint(data.uid));
-  socket.on('addPoint', data => game.addPoint(data.uid));
+  socket.on('newWord', (data) => {
+    socket.emit('sendWord', { newWord: game.sendWord(data.lid, data.uid) });
+  });
+
+  socket.on('submitWord', async (data) => {
+    const correct = await game.verifyWord(data.lid, data.uid, data.submittedWord);
+    if (correct) {
+      game.addPoint(data.lid, data.uid);
+    } else {
+      game.removePoint(data.lid, data.uid);
+    }
+  });
+  // socket.on('removePoint', data => game.removePoint(data.uid));
+  // socket.on('addPoint', data => game.addPoint(data.uid));
 };
 
 /**
