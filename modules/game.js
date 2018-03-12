@@ -38,6 +38,10 @@ const getScore = async lid => ({
   t2: (await firebase.ref(`/lobbys/${lid}`).once('value')).val().t2Score,
 });
 
+const getUserScore = async (lid, uid) => ({
+  score: (await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value')).val().points,
+});
+
 const whichTeam = async (lid, uid) => {
   let t1 = false;
   let t2 = false;
@@ -113,4 +117,5 @@ module.exports = {
   getWord,
   whichTeam,
   getScore,
+  getUserScore,
 };
