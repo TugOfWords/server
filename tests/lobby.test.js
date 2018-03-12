@@ -16,17 +16,17 @@ describe('Tests for lobby module', async () => {
     firebase.ref(`lobbys/${lid}`).remove();
   });
 
-  it('should remove a lobby in the firebase database', async () => {
-    const uid = 'remove-lobby-test-uid';
-    createUser(uid, 'remove-lobby-test-username');
-    const lid = 'remove-lobby-test-id';
-    createLobby(lid, uid);
-    if (!leaveLobby(lid)) {
-      assert(null);
-    }
-    firebase.ref(`users/${uid}`).remove();
-    firebase.ref(`lobbys/${lid}`).remove();
-  });
+  // it('should remove a lobby in the firebase database', async () => {
+  //   const uid = 'remove-lobby-test-uid';
+  //   createUser(uid, 'remove-lobby-test-username');
+  //   const lid = 'remove-lobby-test-id';
+  //   createLobby(lid, uid);
+  //   if (!leaveLobby(lid)) {
+  //     assert(null);
+  //   }
+  //   firebase.ref(`users/${uid}`).remove();
+  //   firebase.ref(`lobbys/${lid}`).remove();
+  // });
 
   it('should allow users to join a lobby', async () => {
     const uid = 'join-lobby-test-uid';
@@ -56,7 +56,6 @@ describe('Tests for lobby module', async () => {
     if (!leaveLobby(lid)) {
       assert(null);
     }
-    leaveLobby(lid);
     firebase.ref(`lobbys/${lid}`).remove();
     firebase.ref(`users/${uid}`).remove();
     firebase.ref(`users/${uid2}`).remove();
@@ -65,16 +64,15 @@ describe('Tests for lobby module', async () => {
   it('should allow users to join a team', async () => {
     const uid = 'join-team-test-uid';
     createUser(uid, 'join-team-test-username');
-    const lid = 'join-team-test-id';
-    createLobby(lid, uid);
-    joinLobby(lid, uid);
-    joinTeam(lid, 1, uid);
-    await firebase.ref(`/lobbys/${lid}`).once('value').then((snap) => {
+    const lid = 'join-team-test-lid';
+    await createLobby(lid, uid);
+    await joinLobby(lid, uid);
+    await joinTeam(lid, 1, uid);
+    await firebase.ref(`/lobbys/${lid}/t1/${uid}`).once('value').then((snap) => {
       if (!snap.val()) {
         assert(null);
       }
     });
-    leaveLobby(lid);
     firebase.ref(`lobbys/${lid}`).remove();
     firebase.ref(`users/${uid}`).remove();
   });
@@ -83,10 +81,10 @@ describe('Tests for lobby module', async () => {
     const uid = 'leave-team-lobby-test-uid';
     createUser(uid, 'leave-team-test-username');
     const lid = 'leave-team-test-id';
-    createLobby(lid, uid);
-    joinLobby(lid, uid);
-    joinTeam(lid, 1, uid);
-    leaveTeam(lid, uid);
+    await createLobby(lid, uid);
+    await joinLobby(lid, uid);
+    await joinTeam(lid, 1, uid);
+    await leaveTeam(lid, uid);
     await firebase.ref(`/lobbys/${lid}/t1/${uid}`).once('value').then((snap) => {
       if (snap.val()) {
         assert(null);
