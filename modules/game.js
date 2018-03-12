@@ -14,7 +14,7 @@ const getWord = () => randomWords.generate();
 const sendWord = async (lid, uid) => {
   const randWord = randomWords.generate();
   const ref = await firebase.ref(`/lobbys/${lid}/users/${uid}`);
-  ref.set({ word: randWord });
+  ref.update({ word: randWord });
   return randWord;
 };
 
@@ -34,43 +34,6 @@ const verifyWord = async (lid, uid, submittedWord) => {
   return currWord === submittedWord;
 };
 
-/**
- * Adds a point for the user at the lobby/${lid}/users/${uid} endpoint
- * @param {String} uid
- *   the uid of the user that deserves a point
- * @param {String} lid
- *   the lid of the lobby that the user is in
- *
- * unit test exists
- */
-const addPoint = async (lid, uid) => {
-  let bp;
-  await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
-    bp = snap.val().points;
-    firebase.ref(`/lobbys/${lid}/users/${uid}/points`).set({
-      points: bp + 1,
-    });
-  });
-};
-
-/**
- * Removes a point for the user at the lobby/${lid}/users/${uid} endpoint
- * @param {String} uid
- *   the uid of the user that deserves a point
- * @param {String} lid
- *   the lid of the lobby that the user is in
- *
- *  unit test exists
- */
-const removePoint = async (lid, uid) => {
-  let bp;
-  await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
-    bp = snap.val().points;
-    firebase.ref(`/lobbys/${lid}/users/${uid}/points`).set({
-      points: bp - 1,
-    });
-  });
-};
 
 const whichTeam = async (lid, uid) => {
   let t1 = false;
@@ -88,6 +51,56 @@ const whichTeam = async (lid, uid) => {
   return t1 ? 1 : 2;
 };
 
+const changePoints = async (lid, uid, diff) => {
+  await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
+    const bp = snap.val().points;
+    firebase.ref(`/lobbys/${lid}/users/${uid}`).update({
+      points: bp + diff,
+    });
+  });
+  const team = await whichTeam(lid, uid);
+  if (team === 1) {
+    firebase.ref(`/lobbys/${lid}`).once('value').then((snap) => {
+      const t1Score = snap.val().t1Score + diff;
+      firebase.ref(`/lobbys/${lid}`).update({
+        t1Score,
+      });
+    });
+  } else if (team === 2) {
+    firebase.ref(`/lobbys/${lid}`).once('value').then((snap) => {
+      const t2Score = snap.val().t2Score + diff;
+      firebase.ref(`/lobbys/${lid}`).update({
+        t2Score,
+      });
+    });
+  }
+};
+
+/**
+ * Adds a point for the user at the lobby/${lid}/users/${uid} endpoint
+ * @param {String} uid
+ *   the uid of the user that deserves a point
+ * @param {String} lid
+ *   the lid of the lobby that the user is in
+ *
+ * unit test exists
+ */
+const addPoint = async (lid, uid) => {
+  await changePoints(lid, uid, 1);
+};
+
+/**
+ * Removes a point for the user at the lobby/${lid}/users/${uid} endpoint
+ * @param {String} uid
+ *   the uid of the user that deserves a point
+ * @param {String} lid
+ *   the lid of the lobby that the user is in
+ *
+ *  unit test exists
+ */
+const removePoint = async (lid, uid) => {
+  await changePoints(lid, uid, -1);
+};
 
 module.exports = {
   sendWord,

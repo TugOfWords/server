@@ -1,6 +1,8 @@
 const assert = require('assert');
 const firebase = require('../fire');
-const { getWord, whichTeam } = require('../modules/game');
+const {
+  getWord, whichTeam, addPoint, removePoint,
+} = require('../modules/game');
 const {
   createLobby, joinLobby, joinTeam,
 } = require('../modules/lobby');
@@ -61,23 +63,43 @@ describe('Tests for game module', () => {
     firebase.ref(`users/${uid2}`).remove();
     firebase.ref(`users/${uid3}`).remove();
     firebase.ref(`lobbys/${lid}`).remove();
-  });
+  })
+    .timeout(4000);
 
-  // it('should add points to a certain user', async () => {
-  //   const uid = 'add-point-test-uid';
-  //   const lid = 'add-point-test-lid';
-  //   await createUser(uid, 'add-points-test-username');
-  //   await createLobby(lid, uid);
-  //   await joinLobby(lid, uid);
-  //   let snapshot = await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value');
-  //   const bp = snapshot.val();
-  //   await addPoint(lid, uid);
-  //   snapshot = await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value');
-  //   const ap = snapshot.val().points;
-  //   // assert((ap - bp) === 1);
-  //   firebase.ref(`/lobbys/${lid}`).remove();
-  //   firebase.ref(`/users/${uid}`).remove();
-  // });
+  it('should add and remove points to a certain user and teamScore', async () => {
+    const uid = 'change-point-test-uid';
+    const lid = 'change-point-test-lid';
+    await createUser(uid, 'change-point-test-username');
+    await createLobby(lid, uid);
+    await joinLobby(lid, uid);
+    await joinTeam(lid, 1, uid);
+
+    await addPoint(lid, uid);
+    await addPoint(lid, uid);
+
+    let uscore = 0;
+    let tscore = 0;
+
+    uscore = (await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value')).val().points;
+    tscore = (await firebase.ref(`/lobbys/${lid}`).once('value')).val().t1Score;
+
+    assert.strictEqual(uscore, tscore);
+    assert.strictEqual(uscore, 2);
+
+    await removePoint(lid, uid);
+    await removePoint(lid, uid);
+    await removePoint(lid, uid);
+
+    uscore = (await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value')).val().points;
+    tscore = (await firebase.ref(`/lobbys/${lid}`).once('value')).val().t1Score;
+
+    assert.strictEqual(uscore, tscore);
+    assert.strictEqual(uscore, -1);
+
+    firebase.ref(`/lobbys/${lid}`).remove();
+    firebase.ref(`/users/${uid}`).remove();
+  })
+    .timeout(4000);
 
   // it('should remove points to a certain user', async () => {
   //   const uid = 'remove-point-test-uid';
