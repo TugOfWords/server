@@ -26,8 +26,9 @@ app.use('/users', user.userRouter);
  *   the communication channel between the client and the server
  */
 const onConnection = (socket) => {
-  const lid = socket.request._query.id;
-  console.log(`Connection established for lobby: ${lid}`); // eslint-disable-line no-underscore-dangle
+  const { lid, uid } = socket.request._query;
+  console.log(`Connection established for lobby: ${lid}, User: ${uid}`); // eslint-disable-line no-underscore-dangle
+
   const countdowns = {};
   const startTime = 60; // public lobby wait time (seconds)
   socket.join(lid);
@@ -106,23 +107,24 @@ const onConnection = (socket) => {
 
   socket.on('startGame', async () => {
     io.to(lid).emit('startGame');
+    io.to(lid).emit('score', await game.getScore(lid));
   });
 
   /* GAME */
-  socket.on('newWord', (data) => {
-    socket.emit('sendWord', { newWord: game.sendWord(data.lid, data.uid) });
+  socket.on('newWord', async () => {
+    socket.emit('sendWord', { word: await game.sendWord(lid, uid) });
   });
 
   socket.on('submitWord', async (data) => {
-    const correct = await game.verifyWord(data.lid, data.uid, data.submittedWord);
+    const correct = await game.verifyWord(lid, uid, data.word);
+    socket.emit('sendWord', { word: await game.sendWord(lid, uid) });
     if (correct) {
-      game.addPoint(data.lid, data.uid);
+      await game.addPoint(lid, uid);
     } else {
-      game.removePoint(data.lid, data.uid);
+      await game.removePoint(lid, uid);
     }
+    io.to(lid).emit('score', await game.getScore(lid));
   });
-  // socket.on('removePoint', data => game.removePoint(data.uid));
-  // socket.on('addPoint', data => game.addPoint(data.uid));
 };
 
 /**
@@ -133,7 +135,7 @@ const onConnection = (socket) => {
  *   go to the next middlware
  */
 const checkConnect = async (socket, next) => {
-  const lid = socket.request._query.id;
+  const { lid } = socket.request._query;
   if (lid === undefined) {
     console.log('Connection denied: No lobby id specified.');
     socket.disconnect();

@@ -18,7 +18,6 @@ const sendWord = async (lid, uid) => {
   return randWord;
 };
 
-
 /**
  * Verifies the submitted word against the word stored
  * in the user's object in the firebase lobby
@@ -34,6 +33,10 @@ const verifyWord = async (lid, uid, submittedWord) => {
   return currWord === submittedWord;
 };
 
+const getScore = async lid => ({
+  t1: (await firebase.ref(`/lobbys/${lid}`).once('value')).val().t1Score,
+  t2: (await firebase.ref(`/lobbys/${lid}`).once('value')).val().t2Score,
+});
 
 const whichTeam = async (lid, uid) => {
   let t1 = false;
@@ -109,4 +112,5 @@ module.exports = {
   removePoint,
   getWord,
   whichTeam,
+  getScore,
 };
