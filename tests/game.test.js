@@ -64,7 +64,7 @@ describe('Tests for game module', () => {
     firebase.ref(`users/${uid3}`).remove();
     firebase.ref(`lobbys/${lid}`).remove();
   })
-    .timeout(4000);
+    .timeout(8000);
 
   it('should add and remove points to a certain user and teamScore', async () => {
     const uid = 'change-point-test-uid';
@@ -99,7 +99,7 @@ describe('Tests for game module', () => {
     firebase.ref(`/lobbys/${lid}`).remove();
     firebase.ref(`/users/${uid}`).remove();
   })
-    .timeout(4000);
+    .timeout(8000);
 
   // it('should remove points to a certain user', async () => {
   //   const uid = 'remove-point-test-uid';
