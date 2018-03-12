@@ -35,7 +35,11 @@ const createLobby = async (lid, owner) => {
  */
 const joinLobby = async (lid, uid) => {
   try {
-    if (!(await firebase.ref(`/lobbys/${lid}/active`).once('value'))) {
+    // if (!(await firebase.ref(`/lobbys/${lid}/active`).once('value'))) {
+    //   return false;
+    // }
+    const snapshot = await firebase.ref(`/lobbys/${lid}`).once('value');
+    if (!snapshot.val().active) {
       return false;
     }
     await firebase.ref(`/lobbys/${lid}/users/${uid}`).set({
