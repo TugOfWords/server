@@ -105,6 +105,8 @@ const endGame = async (lid) => {
   end.t1Score = lb.t1Score;
   end.t2Score = lb.t2Score;
   end.winner = lb.t1Score > lb.t2Score ? 1 : 2;
+
+  // firebase.ref(`/lobbys/${lid}`).remove();
   return end;
 };
 
