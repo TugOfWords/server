@@ -47,7 +47,7 @@ const addPoint = async (lid, uid) => {
   let bp;
   await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
     bp = snap.val().points;
-    firebase.ref(`/lobbys/${lid}/users/${uid}/points`).set({
+    firebase.ref(`/lobbys/${lid}/users/${uid}`).set({
       points: bp + 1,
     });
   });
@@ -66,7 +66,7 @@ const removePoint = async (lid, uid) => {
   let bp;
   await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value').then((snap) => {
     bp = snap.val().points;
-    firebase.ref(`/lobbys/${lid}/users/${uid}/points`).set({
+    firebase.ref(`/lobbys/${lid}/users/${uid}`).set({
       points: bp - 1,
     });
   });
