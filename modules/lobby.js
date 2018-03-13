@@ -18,6 +18,7 @@ const createLobby = async (lid, owner) => {
   try {
     await firebase.ref(`/lobbys/${lid}`).set({
       active: true,
+      gameplay: false,
       owner,
       t1Score: 0,
       t2Score: 0,

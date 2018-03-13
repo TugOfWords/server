@@ -83,6 +83,31 @@ const changePoints = async (lid, uid, diff) => {
   }
 };
 
+const endGame = async (lid) => {
+  firebase.ref(`/lobbys/${lid}`).update({
+    active: false,
+    gameplay: false,
+  });
+  const lb = (await firebase.ref(`/lobbys/${lid}`).once('value')).val();
+  const end = {};
+  end.t1 = {};
+  const entries1 = Object.entries(lb.t1);
+  for (let i = 0; i < entries1.length; i += 1) {
+    const entry = entries1[i];
+    end.t1[entry[1].username] = lb.users[entry[0]].points;
+  }
+  end.t2 = {};
+  const entries2 = Object.entries(lb.t2);
+  for (let i = 0; i < entries2.length; i += 1) {
+    const entry = entries2[i];
+    end.t2[entry[1].username] = lb.users[entry[0]].points;
+  }
+  end.t1Score = lb.t1Score;
+  end.t2Score = lb.t2Score;
+  end.winner = lb.t1Score > lb.t2Score ? 1 : 2;
+  return end;
+};
+
 /**
  * Adds a point for the user at the lobby/${lid}/users/${uid} endpoint
  * @param {String} uid
@@ -118,4 +143,5 @@ module.exports = {
   whichTeam,
   getScore,
   getUserScore,
+  endGame,
 };

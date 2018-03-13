@@ -117,15 +117,20 @@ const onConnection = (socket) => {
   });
 
   socket.on('submitWord', async (data) => {
-    socket.emit('sendWord', { word: await game.sendWord(lid, uid) });
     const correct = await game.verifyWord(lid, uid, data.word);
+    socket.emit('sendWord', { word: await game.sendWord(lid, uid) });
     if (correct) {
       await game.addPoint(lid, uid);
     } else {
       await game.removePoint(lid, uid);
     }
-    io.to(lid).emit('score', await game.getScore(lid));
+    const score = await game.getScore(lid);
+    io.to(lid).emit('score', score);
     socket.emit('uscore', await game.getUserScore(lid, uid));
+
+    if (Math.abs(score.t1 - score.t2) >= 5) {
+      io.to(lid).emit('end', await game.endGame(lid));
+    }
   });
 };
 
