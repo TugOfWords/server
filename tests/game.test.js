@@ -100,20 +100,4 @@ describe('Tests for game module', () => {
     firebase.ref(`/users/${uid}`).remove();
   })
     .timeout(8000);
-
-  // it('should remove points to a certain user', async () => {
-  //   const uid = 'remove-point-test-uid';
-  //   const lid = 'remove-point-test-lid';
-  //   createUser(uid, 'remove-points-test-username');
-  //   createLobby(lid, uid);
-  //   joinLobby(lid, uid);
-  //   let snapshot = await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value');
-  //   const bp = snapshot.val().points;
-  //   await removePoint(lid, uid);
-  //   snapshot = await firebase.ref(`/lobbys/${lid}/users/${uid}`).once('value');
-  //   const ap = snapshot.val().points;
-  //   // assert((bp - ap) === 1);
-  //   firebase.ref(`/lobbys/${lid}`).remove();
-  //   firebase.ref(`/users/${uid}`).remove();
-  // });
 });
