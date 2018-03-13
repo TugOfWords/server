@@ -21,7 +21,7 @@ describe('Tests for lobby module', async () => {
   //   createUser(uid, 'remove-lobby-test-username');
   //   const lid = 'remove-lobby-test-id';
   //   createLobby(lid, uid);
-  //   if (!leaveLobby(lid)) {
+
   //     assert(null);
   //   }
   //   firebase.ref(`users/${uid}`).remove();
@@ -64,6 +64,7 @@ describe('Tests for lobby module', async () => {
   it('should allow users to join a team', async () => {
     const uid = 'join-team-test-uid';
     createUser(uid, 'join-team-test-username');
+
     const lid = 'join-team-test-lid';
     await createLobby(lid, uid);
     await joinLobby(lid, uid);

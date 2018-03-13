@@ -18,7 +18,10 @@ const createLobby = async (lid, owner) => {
   try {
     await firebase.ref(`/lobbys/${lid}`).set({
       active: true,
+      gameplay: false,
       owner,
+      t1Score: 0,
+      t2Score: 0,
     });
     return true;
   } catch (e) {
@@ -64,6 +67,7 @@ const leaveTeam = async (lid, uid) => {
     const updates = {};
     updates[`/lobbys/${lid}/t1/${uid}`] = null;
     updates[`/lobbys/${lid}/t2/${uid}`] = null;
+    updates[`/lobbys/${lid}/users/${uid}`] = null;
     await firebase.ref().update(updates);
     return true;
   } catch (e) {
@@ -106,6 +110,10 @@ const joinTeam = async (lid, teamNumber, uid) => {
     const snapshot = await firebase.ref(`/users/${uid}`).once('value');
     const { username } = snapshot.val();
     await firebase.ref(`/lobbys/${lid}/t${teamNumber}/${uid}`).set({ username });
+    await firebase.ref(`/lobbys/${lid}/users/${uid}`).set({
+      word: 0,
+      points: 0,
+    });
     return true;
   } catch (e) {
     return false;

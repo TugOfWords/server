@@ -26,10 +26,12 @@ app.use('/users', user.userRouter);
  *   the communication channel between the client and the server
  */
 const onConnection = (socket) => {
-  const lid = socket.request._query.id;
-  console.log(`Connection established for lobby: ${lid}`); // eslint-disable-line no-underscore-dangle
+  const { lid, uid } = socket.request._query;
+  console.log(`Connection established for lobby: ${lid}, User: ${uid}`); // eslint-disable-line no-underscore-dangle
+
   const countdowns = {};
   const startTime = 60; // public lobby wait time (seconds)
+  socket.join(lid);
 
   /* LOBBY */
   socket.on('joinLobby', async (data) => {
@@ -103,11 +105,33 @@ const onConnection = (socket) => {
     io.sockets.emit(`got teams ${lid}`, teams);
   });
 
+  socket.on('startGame', async () => {
+    io.to(lid).emit('startGame');
+    io.to(lid).emit('score', await game.getScore(lid));
+    socket.emit('uscore', await game.getUserScore(lid, uid));
+  });
+
   /* GAME */
-  socket.on('sendWord', data => socket.emit('sendWord', { newWord: game.sendWord(data.lid, data.uid, data.submittedWord) }));
-  socket.on('verifyWord', data => socket.emit('verifyWord', { isCorrect: game.verifyWord(data.lid, data.uid, data.submittedWord) }));
-  socket.on('removePoint', data => game.removePoint(data.uid));
-  socket.on('addPoint', data => game.addPoint(data.uid));
+  socket.on('newWord', async () => {
+    socket.emit('sendWord', { word: await game.sendWord(lid, uid) });
+  });
+
+  socket.on('submitWord', async (data) => {
+    const correct = await game.verifyWord(lid, uid, data.word);
+    socket.emit('sendWord', { word: await game.sendWord(lid, uid) });
+    if (correct) {
+      await game.addPoint(lid, uid);
+    } else {
+      await game.removePoint(lid, uid);
+    }
+    const score = await game.getScore(lid);
+    io.to(lid).emit('score', score);
+    socket.emit('uscore', await game.getUserScore(lid, uid));
+
+    if (Math.abs(score.t1 - score.t2) >= 5) {
+      io.to(lid).emit('end', await game.endGame(lid));
+    }
+  });
 };
 
 /**
@@ -118,7 +142,7 @@ const onConnection = (socket) => {
  *   go to the next middlware
  */
 const checkConnect = async (socket, next) => {
-  const lid = socket.request._query.id;
+  const { lid } = socket.request._query;
   if (lid === undefined) {
     console.log('Connection denied: No lobby id specified.');
     socket.disconnect();
