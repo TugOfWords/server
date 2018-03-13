@@ -1,12 +1,12 @@
 const firebase = require('firebase');
 
 const config = {
-  apiKey: 'AIzaSyBruBNPWwCaSw-zUqlZNxYnQ-uHBH7z7Cs',
+  apiKey: process.env.FIREBASE_API_KEY,
   authDomain: 'tug-of-words.firebaseapp.com',
   databaseURL: 'https://tug-of-words.firebaseio.com',
   projectId: 'tug-of-words',
   storageBucket: 'tug-of-words.appspot.com',
-  messagingSenderId: '874967513988',
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
 };
 
 firebase.initializeApp(config);

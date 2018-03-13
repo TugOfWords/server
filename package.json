@@ -8,6 +8,7 @@
   "license": "MIT",
   "scripts": {
     "test": "mocha **/*.test.js --recursive --exit",
+    "start": "node app",
     "lint": "eslint . --ext .js",
     "validate": "npm ls"
   },
