@@ -32,3 +32,8 @@ We are using [eslint](https://eslint.org/) with enforced [styles](https://github
 - To lint the entire code:
 `yarn lint`
 - You will not be able to commit code unless it passes the linter checks
+
+### Executable/Public Access URL
+Our deployed project can be found at https://tugofwords.herokuapp.com/
+
+The buggy version of our project can be found at http://bugofwords.herokuapp.com/
